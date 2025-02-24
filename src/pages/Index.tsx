@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LogIn, UserPlus, Lock } from 'lucide-react';
+import { LogIn, UserPlus, Lock, School, UserCog } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -10,6 +10,8 @@ import { toast } from "sonner";
 interface UserData {
   email: string;
   password: string;
+  role: 'admin' | 'student';
+  name: string;
 }
 
 const Index = () => {
@@ -17,10 +19,12 @@ const Index = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [role, setRole] = useState<'admin' | 'student'>('student');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const userData: UserData = { email, password };
+    const userData: UserData = { email, password, role, name };
     
     try {
       // Save to local storage as JSON
@@ -32,6 +36,13 @@ const Index = () => {
           toast.error("User already exists!");
           return;
         }
+        
+        // For admin registration, check if admin already exists
+        if (role === 'admin' && existingData.some((user: UserData) => user.role === 'admin')) {
+          toast.error("Admin account already exists!");
+          return;
+        }
+
         existingData.push(userData);
         localStorage.setItem('users', JSON.stringify(existingData));
         toast.success("Registration successful!");
@@ -41,7 +52,11 @@ const Index = () => {
           user.email === email && user.password === password
         );
         if (user) {
-          localStorage.setItem('currentUser', JSON.stringify({ email: user.email }));
+          localStorage.setItem('currentUser', JSON.stringify({ 
+            email: user.email,
+            name: user.name,
+            role: user.role
+          }));
           toast.success("Login successful!");
           navigate('/dashboard');
         } else {
@@ -58,17 +73,56 @@ const Index = () => {
       <Card className="w-full max-w-md p-8 backdrop-blur-sm bg-white/90 shadow-xl transition-all duration-300 hover:shadow-2xl">
         <div className="text-center mb-8">
           <div className="inline-block p-3 rounded-full bg-gray-50 mb-4">
-            <Lock className="w-6 h-6 text-gray-700" />
+            {isLogin ? (
+              <School className="w-8 h-8 text-gray-700" />
+            ) : (
+              role === 'admin' ? <UserCog className="w-8 h-8 text-gray-700" /> : <School className="w-8 h-8 text-gray-700" />
+            )}
           </div>
           <h1 className="text-2xl font-semibold text-gray-800 mb-2">
-            {isLogin ? 'Welcome Back' : 'Create Account'}
+            {isLogin ? 'Academy Login' : `${role === 'admin' ? 'Admin' : 'Student'} Registration`}
           </h1>
           <p className="text-gray-600 text-sm">
-            {isLogin ? 'Sign in to access your account' : 'Register for a new account'}
+            {isLogin ? 'Sign in to access your academy account' : 'Register for a new academy account'}
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {!isLogin && (
+            <>
+              <div className="space-y-2">
+                <Input
+                  type="text"
+                  placeholder="Full Name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  className="w-full px-4 py-2 transition-all duration-200 focus:ring-2 focus:ring-blue-500"
+                  required
+                />
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant={role === 'student' ? 'default' : 'outline'}
+                  className="flex-1"
+                  onClick={() => setRole('student')}
+                >
+                  <School className="w-4 h-4 mr-2" />
+                  Student
+                </Button>
+                <Button
+                  type="button"
+                  variant={role === 'admin' ? 'default' : 'outline'}
+                  className="flex-1"
+                  onClick={() => setRole('admin')}
+                >
+                  <UserCog className="w-4 h-4 mr-2" />
+                  Admin
+                </Button>
+              </div>
+            </>
+          )}
+
           <div className="space-y-2">
             <Input
               type="email"
