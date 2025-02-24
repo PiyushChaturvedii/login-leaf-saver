@@ -12,6 +12,12 @@ interface UserData {
   password: string;
   role: 'admin' | 'student';
   name: string;
+  // Additional student fields
+  github?: string;
+  linkedin?: string;
+  whatsapp?: string;
+  college?: string;
+  course?: string;
 }
 
 const Index = () => {
@@ -20,11 +26,28 @@ const Index = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const [github, setGithub] = useState('');
+  const [linkedin, setLinkedin] = useState('');
+  const [whatsapp, setWhatsapp] = useState('');
+  const [college, setCollege] = useState('');
+  const [course, setCourse] = useState('');
   const [role, setRole] = useState<'admin' | 'student'>('student');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const userData: UserData = { email, password, role, name };
+    const userData: UserData = { 
+      email, 
+      password, 
+      role, 
+      name,
+      ...(role === 'student' && {
+        github,
+        linkedin,
+        whatsapp,
+        college,
+        course
+      })
+    };
     
     try {
       // Save to local storage as JSON
@@ -43,6 +66,13 @@ const Index = () => {
           return;
         }
 
+        // Set default admin credentials if no admin exists
+        if (role === 'admin' && !existingData.some((user: UserData) => user.role === 'admin')) {
+          userData.email = 'admin@academy.com';
+          userData.password = 'admin123';
+          toast.success("Default admin credentials set!");
+        }
+
         existingData.push(userData);
         localStorage.setItem('users', JSON.stringify(existingData));
         toast.success("Registration successful!");
@@ -55,7 +85,12 @@ const Index = () => {
           localStorage.setItem('currentUser', JSON.stringify({ 
             email: user.email,
             name: user.name,
-            role: user.role
+            role: user.role,
+            github: user.github,
+            linkedin: user.linkedin,
+            whatsapp: user.whatsapp,
+            college: user.college,
+            course: user.course
           }));
           toast.success("Login successful!");
           navigate('/dashboard');
@@ -96,10 +131,10 @@ const Index = () => {
                   placeholder="Full Name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full px-4 py-2 transition-all duration-200 focus:ring-2 focus:ring-blue-500"
                   required
                 />
               </div>
+
               <div className="flex gap-2">
                 <Button
                   type="button"
@@ -120,6 +155,46 @@ const Index = () => {
                   Admin
                 </Button>
               </div>
+
+              {role === 'student' && (
+                <>
+                  <Input
+                    type="text"
+                    placeholder="GitHub Profile URL"
+                    value={github}
+                    onChange={(e) => setGithub(e.target.value)}
+                    required
+                  />
+                  <Input
+                    type="text"
+                    placeholder="LinkedIn Profile URL"
+                    value={linkedin}
+                    onChange={(e) => setLinkedin(e.target.value)}
+                    required
+                  />
+                  <Input
+                    type="tel"
+                    placeholder="WhatsApp Number"
+                    value={whatsapp}
+                    onChange={(e) => setWhatsapp(e.target.value)}
+                    required
+                  />
+                  <Input
+                    type="text"
+                    placeholder="College Name"
+                    value={college}
+                    onChange={(e) => setCollege(e.target.value)}
+                    required
+                  />
+                  <Input
+                    type="text"
+                    placeholder="Course/Branch"
+                    value={course}
+                    onChange={(e) => setCourse(e.target.value)}
+                    required
+                  />
+                </>
+              )}
             </>
           )}
 
@@ -129,7 +204,6 @@ const Index = () => {
               placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2 transition-all duration-200 focus:ring-2 focus:ring-blue-500"
               required
             />
           </div>
@@ -140,7 +214,6 @@ const Index = () => {
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2 transition-all duration-200 focus:ring-2 focus:ring-blue-500"
               required
             />
           </div>
