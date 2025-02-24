@@ -1,5 +1,6 @@
 
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { LogIn, UserPlus, Lock } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +13,7 @@ interface UserData {
 }
 
 const Index = () => {
+  const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -35,10 +37,13 @@ const Index = () => {
         toast.success("Registration successful!");
       } else {
         // Login
-        if (existingData.some((user: UserData) => 
+        const user = existingData.find((user: UserData) => 
           user.email === email && user.password === password
-        )) {
+        );
+        if (user) {
+          localStorage.setItem('currentUser', JSON.stringify({ email: user.email }));
           toast.success("Login successful!");
+          navigate('/dashboard');
         } else {
           toast.error("Invalid credentials!");
         }
