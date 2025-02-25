@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LogIn, UserPlus, Lock, School, UserCog } from 'lucide-react';
@@ -10,7 +9,7 @@ import { toast } from "sonner";
 interface UserData {
   email: string;
   password: string;
-  role: 'admin' | 'student';
+  role: 'admin' | 'instructor' | 'student';
   name: string;
   // Additional student fields
   github?: string;
@@ -18,6 +17,12 @@ interface UserData {
   whatsapp?: string;
   college?: string;
   course?: string;
+  fees?: {
+    amount: number;
+    paid: number;
+    lastPaid?: string;
+  };
+  photo?: string;
 }
 
 const Index = () => {
@@ -31,7 +36,7 @@ const Index = () => {
   const [whatsapp, setWhatsapp] = useState('');
   const [college, setCollege] = useState('');
   const [course, setCourse] = useState('');
-  const [role, setRole] = useState<'admin' | 'student'>('student');
+  const [role, setRole] = useState<'admin' | 'instructor' | 'student'>('student');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -144,6 +149,15 @@ const Index = () => {
                 >
                   <School className="w-4 h-4 mr-2" />
                   Student
+                </Button>
+                <Button
+                  type="button"
+                  variant={role === 'instructor' ? 'default' : 'outline'}
+                  className="flex-1"
+                  onClick={() => setRole('instructor')}
+                >
+                  <UserCog className="w-4 h-4 mr-2" />
+                  Instructor
                 </Button>
                 <Button
                   type="button"
