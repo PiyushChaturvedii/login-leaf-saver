@@ -8,6 +8,7 @@ import { toast } from "sonner";
 interface UserData {
   email: string;
   name: string;
+  role: 'admin' | 'instructor' | 'student'; // Added role property
   fees?: {
     amount: number;
     paid: number;
