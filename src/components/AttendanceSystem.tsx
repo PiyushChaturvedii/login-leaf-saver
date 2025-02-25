@@ -66,6 +66,13 @@ export const AttendanceSystem = ({ isInstructor, userEmail }: AttendanceProps) =
     toast.success('Attendance submitted successfully!');
   };
 
+  const getAttendanceStats = (email: string) => {
+    const totalSessions = attendanceCode ? 1 : 0;
+    const attended = attendances.filter(a => a.studentEmail === email).length;
+    const absent = totalSessions - attended;
+    return { totalSessions, attended, absent };
+  };
+
   return (
     <Card className="p-6 bg-white shadow-lg">
       <h3 className="text-lg font-medium text-gray-800 mb-4">
@@ -86,11 +93,19 @@ export const AttendanceSystem = ({ isInstructor, userEmail }: AttendanceProps) =
           )}
           <div className="mt-4">
             <h4 className="font-medium mb-2">Attendance Records</h4>
-            {attendances.map((attendance) => (
-              <div key={attendance.id} className="text-sm">
-                {attendance.studentEmail} - {new Date(attendance.submittedAt).toLocaleString()}
-              </div>
-            ))}
+            {Array.from(new Set(attendances.map(a => a.studentEmail))).map(email => {
+              const stats = getAttendanceStats(email);
+              return (
+                <div key={email} className="border p-2 rounded mb-2">
+                  <p className="font-medium">{email}</p>
+                  <p className="text-sm text-gray-600">
+                    Total Sessions: {stats.totalSessions} | 
+                    Attended: {stats.attended} | 
+                    Absent: {stats.absent}
+                  </p>
+                </div>
+              );
+            })}
           </div>
         </div>
       ) : (
@@ -108,6 +123,17 @@ export const AttendanceSystem = ({ isInstructor, userEmail }: AttendanceProps) =
           </form>
           <div className="mt-4">
             <h4 className="font-medium mb-2">My Attendance Records</h4>
+            {userEmail && (
+              <div className="mb-4">
+                <p className="text-sm font-medium">Attendance Statistics</p>
+                <div className="text-sm text-gray-600">
+                  {(() => {
+                    const stats = getAttendanceStats(userEmail);
+                    return `Total Sessions: ${stats.totalSessions} | Attended: ${stats.attended} | Absent: ${stats.absent}`;
+                  })()}
+                </div>
+              </div>
+            )}
             {attendances
               .filter(a => a.studentEmail === userEmail)
               .map((attendance) => (

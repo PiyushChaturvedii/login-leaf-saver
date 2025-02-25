@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LogOut, Home } from 'lucide-react';
@@ -9,6 +8,7 @@ import { AdminFees } from "@/components/AdminFees";
 import { StudentProfile } from "@/components/StudentProfile";
 import { AttendanceSystem } from "@/components/AttendanceSystem";
 import { ProjectManagement } from "@/components/ProjectManagement";
+import { AdminProfile } from "@/components/AdminProfile";
 
 interface UserData {
   email: string;
@@ -25,7 +25,7 @@ interface UserData {
 const Dashboard = () => {
   const navigate = useNavigate();
   const [userData, setUserData] = useState<UserData | null>(null);
-  const [activeTab, setActiveTab] = useState<'projects' | 'profile' | 'attendance' | 'students' | 'fees'>('projects');
+  const [activeTab, setActiveTab] = useState<'projects' | 'profile' | 'attendance' | 'students' | 'fees' | 'users'>('projects');
 
   useEffect(() => {
     const currentUser = localStorage.getItem('currentUser');
@@ -63,13 +63,18 @@ const Dashboard = () => {
               </Button>
               {userData.role === 'admin' && (
                 <>
-                  <Button variant="ghost" onClick={() => setActiveTab('students')}>
-                    Students
+                  <Button variant="ghost" onClick={() => setActiveTab('users')}>
+                    Users
                   </Button>
                   <Button variant="ghost" onClick={() => setActiveTab('fees')}>
                     Fees
                   </Button>
                 </>
+              )}
+              {userData.role === 'instructor' && (
+                <Button variant="ghost" onClick={() => setActiveTab('attendance')}>
+                  Attendance
+                </Button>
               )}
               {userData.role === 'student' && (
                 <>
@@ -105,6 +110,10 @@ const Dashboard = () => {
 
         {activeTab === 'fees' && userData.role === 'admin' && (
           <AdminFees />
+        )}
+
+        {activeTab === 'users' && userData.role === 'admin' && (
+          <AdminProfile />
         )}
 
         {activeTab === 'profile' && userData.role === 'student' && (

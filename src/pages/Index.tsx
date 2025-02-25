@@ -11,6 +11,7 @@ interface UserData {
   password: string;
   role: 'admin' | 'instructor' | 'student';
   name: string;
+  approved?: boolean;
   // Additional student fields
   github?: string;
   linkedin?: string;
@@ -37,57 +38,62 @@ const Index = () => {
   const [college, setCollege] = useState('');
   const [course, setCourse] = useState('');
   const [role, setRole] = useState<'admin' | 'instructor' | 'student'>('student');
+  const [resetEmail, setResetEmail] = useState('');
+  const [showResetForm, setShowResetForm] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const userData: UserData = { 
-      email, 
-      password, 
-      role, 
-      name,
-      ...(role === 'student' && {
-        github,
-        linkedin,
-        whatsapp,
-        college,
-        course
-      })
-    };
-    
+
     try {
-      // Save to local storage as JSON
-      const existingData = JSON.parse(localStorage.getItem('users') || '[]');
-      
       if (!isLogin) {
         // Registration
+        const existingData = JSON.parse(localStorage.getItem('users') || '[]');
+        
         if (existingData.some((user: UserData) => user.email === email)) {
           toast.error("User already exists!");
           return;
         }
-        
-        // For admin registration, check if admin already exists
-        if (role === 'admin' && existingData.some((user: UserData) => user.role === 'admin')) {
-          toast.error("Admin account already exists!");
-          return;
-        }
 
-        // Set default admin credentials if no admin exists
+        const userData: UserData = {
+          email,
+          password,
+          role,
+          name,
+          approved: role === 'admin', // Auto-approve admin accounts
+          ...(role === 'student' && {
+            github,
+            linkedin,
+            whatsapp,
+            college,
+            course,
+          }),
+        };
+
         if (role === 'admin' && !existingData.some((user: UserData) => user.role === 'admin')) {
           userData.email = 'admin@academy.com';
           userData.password = 'admin123';
+          userData.approved = true;
           toast.success("Default admin credentials set!");
         }
 
         existingData.push(userData);
         localStorage.setItem('users', JSON.stringify(existingData));
-        toast.success("Registration successful!");
+        toast.success("Registration successful! Waiting for admin approval.");
+        setIsLogin(true);
       } else {
         // Login
-        const user = existingData.find((user: UserData) => 
-          user.email === email && user.password === password
+        const users = JSON.parse(localStorage.getItem('users') || '[]');
+        const user = users.find((u: UserData) => 
+          u.email === email && u.password === password
         );
+
         if (user) {
-          localStorage.setItem('currentUser', JSON.stringify({ 
+          if (!user.approved) {
+            toast.error("Your account is pending admin approval!");
+            return;
+          }
+
+          localStorage.setItem('currentUser', JSON.stringify({
             email: user.email,
             name: user.name,
             role: user.role,
@@ -95,7 +101,8 @@ const Index = () => {
             linkedin: user.linkedin,
             whatsapp: user.whatsapp,
             college: user.college,
-            course: user.course
+            course: user.course,
+            photo: user.photo,
           }));
           toast.success("Login successful!");
           navigate('/dashboard');
@@ -106,6 +113,24 @@ const Index = () => {
     } catch (error) {
       toast.error("An error occurred!");
     }
+  };
+
+  const handlePasswordReset = (e: React.FormEvent) => {
+    e.preventDefault();
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const userIndex = users.findIndex((u: UserData) => u.email === resetEmail);
+    
+    if (userIndex === -1) {
+      toast.error("User not found!");
+      return;
+    }
+
+    const newPassword = Math.random().toString(36).slice(-8);
+    users[userIndex].password = newPassword;
+    localStorage.setItem('users', JSON.stringify(users));
+    toast.success(`Password reset successful! New password: ${newPassword}`);
+    setShowResetForm(false);
+    setResetEmail('');
   };
 
   return (
@@ -120,139 +145,156 @@ const Index = () => {
             )}
           </div>
           <h1 className="text-2xl font-semibold text-gray-800 mb-2">
-            {isLogin ? 'Academy Login' : `${role === 'admin' ? 'Admin' : 'Student'} Registration`}
+            {showResetForm ? 'Reset Password' : (isLogin ? 'Academy Login' : `${role === 'admin' ? 'Admin' : 'Student'} Registration`)}
           </h1>
-          <p className="text-gray-600 text-sm">
-            {isLogin ? 'Sign in to access your academy account' : 'Register for a new academy account'}
-          </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {!isLogin && (
-            <>
-              <div className="space-y-2">
-                <Input
-                  type="text"
-                  placeholder="Full Name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                />
-              </div>
-
-              <div className="flex gap-2">
-                <Button
-                  type="button"
-                  variant={role === 'student' ? 'default' : 'outline'}
-                  className="flex-1"
-                  onClick={() => setRole('student')}
-                >
-                  <School className="w-4 h-4 mr-2" />
-                  Student
-                </Button>
-                <Button
-                  type="button"
-                  variant={role === 'instructor' ? 'default' : 'outline'}
-                  className="flex-1"
-                  onClick={() => setRole('instructor')}
-                >
-                  <UserCog className="w-4 h-4 mr-2" />
-                  Instructor
-                </Button>
-                <Button
-                  type="button"
-                  variant={role === 'admin' ? 'default' : 'outline'}
-                  className="flex-1"
-                  onClick={() => setRole('admin')}
-                >
-                  <UserCog className="w-4 h-4 mr-2" />
-                  Admin
-                </Button>
-              </div>
-
-              {role === 'student' && (
-                <>
-                  <Input
-                    type="text"
-                    placeholder="GitHub Profile URL"
-                    value={github}
-                    onChange={(e) => setGithub(e.target.value)}
-                    required
-                  />
-                  <Input
-                    type="text"
-                    placeholder="LinkedIn Profile URL"
-                    value={linkedin}
-                    onChange={(e) => setLinkedin(e.target.value)}
-                    required
-                  />
-                  <Input
-                    type="tel"
-                    placeholder="WhatsApp Number"
-                    value={whatsapp}
-                    onChange={(e) => setWhatsapp(e.target.value)}
-                    required
-                  />
-                  <Input
-                    type="text"
-                    placeholder="College Name"
-                    value={college}
-                    onChange={(e) => setCollege(e.target.value)}
-                    required
-                  />
-                  <Input
-                    type="text"
-                    placeholder="Course/Branch"
-                    value={course}
-                    onChange={(e) => setCourse(e.target.value)}
-                    required
-                  />
-                </>
-              )}
-            </>
-          )}
-
-          <div className="space-y-2">
+        {showResetForm ? (
+          <form onSubmit={handlePasswordReset} className="space-y-4">
             <Input
               type="email"
               placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={resetEmail}
+              onChange={(e) => setResetEmail(e.target.value)}
               required
             />
-          </div>
-          
-          <div className="space-y-2">
-            <Input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
+            <Button type="submit" className="w-full">Reset Password</Button>
+            <Button 
+              type="button" 
+              variant="ghost" 
+              className="w-full"
+              onClick={() => setShowResetForm(false)}
+            >
+              Back to Login
+            </Button>
+          </form>
+        ) : (
+          <>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {!isLogin && (
+                <>
+                  <Input
+                    type="text"
+                    placeholder="Full Name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required
+                  />
 
-          <Button
-            type="submit"
-            className="w-full bg-gray-900 hover:bg-gray-800 text-white transition-all duration-200"
-          >
-            {isLogin ? (
-              <LogIn className="w-4 h-4 mr-2" />
-            ) : (
-              <UserPlus className="w-4 h-4 mr-2" />
-            )}
-            {isLogin ? 'Sign In' : 'Create Account'}
-          </Button>
-        </form>
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      variant={role === 'student' ? 'default' : 'outline'}
+                      className="flex-1"
+                      onClick={() => setRole('student')}
+                    >
+                      <School className="w-4 h-4 mr-2" />
+                      Student
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={role === 'instructor' ? 'default' : 'outline'}
+                      className="flex-1"
+                      onClick={() => setRole('instructor')}
+                    >
+                      <UserCog className="w-4 h-4 mr-2" />
+                      Instructor
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={role === 'admin' ? 'default' : 'outline'}
+                      className="flex-1"
+                      onClick={() => setRole('admin')}
+                    >
+                      <UserCog className="w-4 h-4 mr-2" />
+                      Admin
+                    </Button>
+                  </div>
 
-        <div className="mt-6 text-center">
-          <button
-            onClick={() => setIsLogin(!isLogin)}
-            className="text-sm text-gray-600 hover:text-gray-900 transition-colors duration-200"
-          >
-            {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
-          </button>
-        </div>
+                  {role === 'student' && (
+                    <>
+                      <Input
+                        type="text"
+                        placeholder="GitHub Profile URL"
+                        value={github}
+                        onChange={(e) => setGithub(e.target.value)}
+                        required
+                      />
+                      <Input
+                        type="text"
+                        placeholder="LinkedIn Profile URL"
+                        value={linkedin}
+                        onChange={(e) => setLinkedin(e.target.value)}
+                        required
+                      />
+                      <Input
+                        type="tel"
+                        placeholder="WhatsApp Number"
+                        value={whatsapp}
+                        onChange={(e) => setWhatsapp(e.target.value)}
+                        required
+                      />
+                      <Input
+                        type="text"
+                        placeholder="College Name"
+                        value={college}
+                        onChange={(e) => setCollege(e.target.value)}
+                        required
+                      />
+                      <Input
+                        type="text"
+                        placeholder="Course/Branch"
+                        value={course}
+                        onChange={(e) => setCourse(e.target.value)}
+                        required
+                      />
+                    </>
+                  )}
+                </>
+              )}
+
+              <Input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+              <Input
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <Button type="submit" className="w-full">
+                {isLogin ? (
+                  <LogIn className="w-4 h-4 mr-2" />
+                ) : (
+                  <UserPlus className="w-4 h-4 mr-2" />
+                )}
+                {isLogin ? 'Sign In' : 'Create Account'}
+              </Button>
+            </form>
+
+            <div className="mt-6 text-center space-y-2">
+              {isLogin && (
+                <button
+                  onClick={() => setShowResetForm(true)}
+                  className="text-sm text-blue-600 hover:underline block w-full"
+                >
+                  Forgot Password?
+                </button>
+              )}
+              <button
+                onClick={() => setIsLogin(!isLogin)}
+                className="text-sm text-gray-600 hover:text-gray-900 transition-colors duration-200"
+              >
+                {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
+              </button>
+            </div>
+          </>
+        )}
       </Card>
     </div>
   );
