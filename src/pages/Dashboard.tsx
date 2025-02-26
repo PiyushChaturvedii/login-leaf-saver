@@ -1,6 +1,7 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Home } from 'lucide-react';
+import { LogOut, Home, FileText } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { WelcomeMessage } from "@/components/WelcomeMessage";
@@ -9,6 +10,7 @@ import { StudentProfile } from "@/components/StudentProfile";
 import { AttendanceSystem } from "@/components/AttendanceSystem";
 import { ProjectManagement } from "@/components/ProjectManagement";
 import { AdminProfile } from "@/components/AdminProfile";
+import { SystemReport } from "@/components/SystemReport";
 
 interface UserData {
   email: string;
@@ -25,7 +27,7 @@ interface UserData {
 const Dashboard = () => {
   const navigate = useNavigate();
   const [userData, setUserData] = useState<UserData | null>(null);
-  const [activeTab, setActiveTab] = useState<'projects' | 'profile' | 'attendance' | 'students' | 'fees' | 'users'>('projects');
+  const [activeTab, setActiveTab] = useState<'projects' | 'profile' | 'attendance' | 'students' | 'fees' | 'users' | 'report'>('projects');
 
   useEffect(() => {
     const currentUser = localStorage.getItem('currentUser');
@@ -69,12 +71,22 @@ const Dashboard = () => {
                   <Button variant="ghost" onClick={() => setActiveTab('fees')}>
                     Fees
                   </Button>
+                  <Button variant="ghost" onClick={() => setActiveTab('report')}>
+                    <FileText className="w-5 h-5 mr-2" />
+                    Report
+                  </Button>
                 </>
               )}
               {userData.role === 'instructor' && (
-                <Button variant="ghost" onClick={() => setActiveTab('attendance')}>
-                  Attendance
-                </Button>
+                <>
+                  <Button variant="ghost" onClick={() => setActiveTab('attendance')}>
+                    Attendance
+                  </Button>
+                  <Button variant="ghost" onClick={() => setActiveTab('report')}>
+                    <FileText className="w-5 h-5 mr-2" />
+                    Report
+                  </Button>
+                </>
               )}
               {userData.role === 'student' && (
                 <>
@@ -125,6 +137,10 @@ const Dashboard = () => {
             isInstructor={userData.role === 'instructor'} 
             userEmail={userData.email}
           />
+        )}
+
+        {activeTab === 'report' && (userData.role === 'admin' || userData.role === 'instructor') && (
+          <SystemReport />
         )}
       </div>
     </div>
