@@ -18,6 +18,8 @@ interface ProfileProps {
 
 export const StudentProfile = ({ userData }: ProfileProps) => {
   const [profilePhoto, setProfilePhoto] = useState<string>(userData.photo || '');
+  const fees = JSON.parse(localStorage.getItem('users') || '[]')
+    .find((user: any) => user.email === userData.email)?.fees;
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -70,15 +72,8 @@ export const StudentProfile = ({ userData }: ProfileProps) => {
             <p className="text-gray-600">{userData.email}</p>
           </div>
         </div>
+
         <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="text-sm font-medium text-gray-600">Name</label>
-            <p className="mt-1">{userData.name}</p>
-          </div>
-          <div>
-            <label className="text-sm font-medium text-gray-600">Email</label>
-            <p className="mt-1">{userData.email}</p>
-          </div>
           <div>
             <label className="text-sm font-medium text-gray-600">College</label>
             <p className="mt-1">{userData.college}</p>
@@ -114,7 +109,50 @@ export const StudentProfile = ({ userData }: ProfileProps) => {
             <p className="mt-1">{userData.whatsapp}</p>
           </div>
         </div>
+
+        {fees && (
+          <div className="mt-8">
+            <h4 className="text-lg font-medium text-gray-800 mb-4">Fee Details</h4>
+            <div className="grid grid-cols-2 gap-4 bg-gray-50 p-4 rounded-lg">
+              <div>
+                <label className="text-sm font-medium text-gray-600">Base Amount</label>
+                <p className="mt-1">₹{fees.amount}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-600">GST (18%)</label>
+                <p className="mt-1">₹{fees.gstAmount}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-600">Total Amount</label>
+                <p className="mt-1">₹{fees.totalAmount}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-600">Amount Paid</label>
+                <p className="mt-1">₹{fees.paid}</p>
+              </div>
+              {fees.emiPlan && (
+                <>
+                  <div>
+                    <label className="text-sm font-medium text-gray-600">EMI Amount</label>
+                    <p className="mt-1">₹{fees.emiPlan.emiAmount}/month</p>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium text-gray-600">EMIs Status</label>
+                    <p className="mt-1">{fees.emiPlan.paidEmis} paid of {fees.emiPlan.totalEmis} total</p>
+                  </div>
+                </>
+              )}
+              {fees.lastPaid && (
+                <div className="col-span-2">
+                  <label className="text-sm font-medium text-gray-600">Last Payment Date</label>
+                  <p className="mt-1">{new Date(fees.lastPaid).toLocaleDateString()}</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </Card>
   );
 };
+
