@@ -20,10 +20,33 @@ export const LoginForm = ({ onToggleForm, onShowResetForm }: LoginFormProps) => 
     e.preventDefault();
     
     try {
+      console.log("Attempting login with:", email, password);
+      
+      // Check if this is the admin
+      if (email === 'admin@academy.com' && password === 'admin123') {
+        console.log("Admin login detected");
+        
+        // Set admin user details in localStorage
+        localStorage.setItem('currentUser', JSON.stringify({
+          email: 'admin@academy.com',
+          name: 'Admin',
+          role: 'admin',
+        }));
+        
+        toast.success("Admin login successful!");
+        navigate('/dashboard');
+        return;
+      }
+      
+      // For non-admin users, check the stored users
       const users = JSON.parse(localStorage.getItem('users') || '[]');
+      console.log("Retrieved users:", users);
+      
       const user = users.find((u: any) => 
         u.email === email && u.password === password
       );
+      
+      console.log("Found user:", user);
 
       if (user) {
         // Admin users can bypass the approval check
@@ -49,6 +72,7 @@ export const LoginForm = ({ onToggleForm, onShowResetForm }: LoginFormProps) => 
         toast.error("Invalid credentials!");
       }
     } catch (error) {
+      console.error("Login error:", error);
       toast.error("An error occurred!");
     }
   };
