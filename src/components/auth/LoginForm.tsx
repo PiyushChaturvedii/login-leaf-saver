@@ -26,7 +26,8 @@ export const LoginForm = ({ onToggleForm, onShowResetForm }: LoginFormProps) => 
       );
 
       if (user) {
-        if (!user.approved) {
+        // Admin users can bypass the approval check
+        if (!user.approved && user.role !== 'admin') {
           toast.error("Your account is pending admin approval!");
           return;
         }

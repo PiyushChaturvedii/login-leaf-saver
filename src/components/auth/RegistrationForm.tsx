@@ -44,12 +44,15 @@ export const RegistrationForm = ({ onToggleForm }: RegistrationFormProps) => {
         return;
       }
 
+      // Check if we're creating the first admin
+      const isFirstAdmin = role === 'admin' && !existingData.some((user: UserData) => user.role === 'admin');
+
       const userData: UserData = {
-        email,
-        password,
+        email: isFirstAdmin ? 'admin@academy.com' : email,
+        password: isFirstAdmin ? 'admin123' : password,
         role,
         name,
-        approved: role === 'admin',
+        approved: role === 'admin', // Admin users are auto-approved
         ...(role === 'student' && {
           github,
           linkedin,
@@ -59,16 +62,19 @@ export const RegistrationForm = ({ onToggleForm }: RegistrationFormProps) => {
         }),
       };
 
-      if (role === 'admin' && !existingData.some((user: UserData) => user.role === 'admin')) {
-        userData.email = 'admin@academy.com';
-        userData.password = 'admin123';
-        userData.approved = true;
+      if (isFirstAdmin) {
         toast.success("Default admin credentials set!");
       }
 
       existingData.push(userData);
       localStorage.setItem('users', JSON.stringify(existingData));
-      toast.success("Registration successful! Waiting for admin approval.");
+      
+      if (role !== 'admin') {
+        toast.success("Registration successful! Waiting for admin approval.");
+      } else {
+        toast.success("Admin registration successful! You can login now.");
+      }
+      
       onToggleForm();
     } catch (error) {
       toast.error("An error occurred!");
