@@ -28,7 +28,8 @@ export const ProjectManagement = ({ userRole, userEmail }: ProjectProps) => {
     JSON.parse(localStorage.getItem('projects') || '[]')
   );
   const [newProjectTitle, setNewProjectTitle] = useState('');
-  const [deployLink, setDeployLink] = useState('');
+  // 使用 Map 来存储每个项目的部署链接
+  const [deployLinks, setDeployLinks] = useState<Map<string, string>>(new Map());
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [timeRemaining, setTimeRemaining] = useState<{[key: string]: {days: number, hours: number, minutes: number, seconds: number}}>({});
@@ -88,7 +89,13 @@ export const ProjectManagement = ({ userRole, userEmail }: ProjectProps) => {
       toast.success('Project created successfully!');
     } else {
       const project = projects.find(p => !p.deployLink);
-      if (project && deployLink) {
+      if (project) {
+        const deployLink = deployLinks.get(project.id) || '';
+        if (!deployLink) {
+          toast.error("Please provide a deployment link!");
+          return;
+        }
+
         const updatedProjects = projects.map(p => 
           p.id === project.id 
             ? { ...p, deployLink, studentEmail: userEmail }
@@ -96,12 +103,24 @@ export const ProjectManagement = ({ userRole, userEmail }: ProjectProps) => {
         );
         localStorage.setItem('projects', JSON.stringify(updatedProjects));
         setProjects(updatedProjects);
-        setDeployLink('');
+        
+        // 清除这个特定项目的链接
+        const newDeployLinks = new Map(deployLinks);
+        newDeployLinks.delete(project.id);
+        setDeployLinks(newDeployLinks);
+        
         toast.success('Project link submitted successfully!');
       } else {
-        toast.error("Please provide a deployment link!");
+        toast.error("No projects available for submission!");
       }
     }
+  };
+
+  // 为特定项目更新部署链接
+  const handleDeployLinkChange = (projectId: string, value: string) => {
+    const newDeployLinks = new Map(deployLinks);
+    newDeployLinks.set(projectId, value);
+    setDeployLinks(newDeployLinks);
   };
 
   const handleGradeSubmit = (projectId: string, grade: number) => {
@@ -174,6 +193,31 @@ export const ProjectManagement = ({ userRole, userEmail }: ProjectProps) => {
         ? <span className="text-green-600 font-medium">Completed</span>
         : <span className="text-amber-600 font-medium">In Progress</span>;
     }
+  };
+
+  // 处理项目提交表单
+  const handleProjectSubmitForm = (e: React.FormEvent, projectId: string) => {
+    e.preventDefault();
+    const deployLink = deployLinks.get(projectId) || '';
+    if (!deployLink) {
+      toast.error("Please provide a deployment link!");
+      return;
+    }
+
+    const updatedProjects = projects.map(p => 
+      p.id === projectId 
+        ? { ...p, deployLink, studentEmail: userEmail }
+        : p
+    );
+    localStorage.setItem('projects', JSON.stringify(updatedProjects));
+    setProjects(updatedProjects);
+    
+    // 清除这个特定项目的链接
+    const newDeployLinks = new Map(deployLinks);
+    newDeployLinks.delete(projectId);
+    setDeployLinks(newDeployLinks);
+    
+    toast.success('Project link submitted successfully!');
   };
 
   return (
@@ -369,12 +413,12 @@ export const ProjectManagement = ({ userRole, userEmail }: ProjectProps) => {
                     )}
                   </div>
                   
-                  <form onSubmit={handleProjectSubmit}>
+                  <form onSubmit={(e) => handleProjectSubmitForm(e, project.id)}>
                     <Input
                       type="url"
                       placeholder="GitHub Deploy Link"
-                      value={deployLink}
-                      onChange={(e) => setDeployLink(e.target.value)}
+                      value={deployLinks.get(project.id) || ''}
+                      onChange={(e) => handleDeployLinkChange(project.id, e.target.value)}
                       required
                       className="border-indigo-100 focus:border-indigo-300 mb-2"
                     />
