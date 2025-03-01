@@ -4,7 +4,14 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { User, Lock } from 'lucide-react';
+import { User, Lock, UserCog } from 'lucide-react';
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface UserData {
   email: string;
@@ -58,6 +65,15 @@ export const AdminProfile = () => {
     toast.success('User deleted successfully!');
   };
 
+  const handleRoleChange = (email: string, newRole: 'admin' | 'instructor' | 'student') => {
+    const updatedUsers = users.map(user =>
+      user.email === email ? { ...user, role: newRole } : user
+    );
+    localStorage.setItem('users', JSON.stringify(updatedUsers));
+    setUsers(updatedUsers);
+    toast.success(`User role updated to ${newRole} successfully!`);
+  };
+
   return (
     <Card className="p-6 bg-white shadow-lg">
       <h3 className="text-lg font-medium text-gray-800 mb-4">User Management</h3>
@@ -74,9 +90,26 @@ export const AdminProfile = () => {
                 <div>
                   <h4 className="font-medium">{user.name}</h4>
                   <p className="text-sm text-gray-600">{user.email}</p>
-                  <p className="text-sm text-gray-600">Role: {user.role}</p>
+                  <div className="flex items-center mt-1">
+                    <p className="text-sm text-gray-600 mr-2">Role:</p>
+                    <Select
+                      defaultValue={user.role}
+                      onValueChange={(value: 'admin' | 'instructor' | 'student') => 
+                        handleRoleChange(user.email, value)
+                      }
+                    >
+                      <SelectTrigger className="w-[180px] h-8 text-sm">
+                        <SelectValue placeholder="Select role" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="admin">Admin</SelectItem>
+                        <SelectItem value="instructor">Instructor</SelectItem>
+                        <SelectItem value="student">Student</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                   {user.role === 'student' && (
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-gray-600 mt-1">
                       College: {user.college} | Course: {user.course}
                     </p>
                   )}
