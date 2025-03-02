@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { PieChart, CalendarIcon, Users } from 'lucide-react';
+import { Progress } from "@/components/ui/progress";
 import {
   Tabs,
   TabsContent,
@@ -81,7 +82,7 @@ export const InstructorDisplay = ({
       
       <TabsContent value="overview" className="space-y-6 mt-0">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="p-4 border border-indigo-100 bg-gradient-to-br from-indigo-50 to-white">
+          <Card className="p-4 border border-indigo-100 bg-gradient-to-br from-indigo-50 to-white transform transition-all duration-300 hover:shadow-lg hover:translate-y-[-3px] animate-fade-in">
             <h4 className="text-sm font-medium text-indigo-500 mb-2">Average Attendance</h4>
             <div className="flex items-end">
               <span className="text-3xl font-bold text-indigo-700">{overallStats.averageAttendance}%</span>
@@ -93,7 +94,7 @@ export const InstructorDisplay = ({
             />
           </Card>
           
-          <Card className="p-4 border border-indigo-100 bg-gradient-to-br from-purple-50 to-white">
+          <Card className="p-4 border border-indigo-100 bg-gradient-to-br from-purple-50 to-white transform transition-all duration-300 hover:shadow-lg hover:translate-y-[-3px] animate-fade-in" style={{ animationDelay: "0.1s" }}>
             <h4 className="text-sm font-medium text-purple-500 mb-2">Total Sessions</h4>
             <div className="flex items-end">
               <span className="text-3xl font-bold text-purple-700">{overallStats.totalSessions}</span>
@@ -101,7 +102,7 @@ export const InstructorDisplay = ({
             </div>
           </Card>
           
-          <Card className="p-4 border border-indigo-100 bg-gradient-to-br from-blue-50 to-white">
+          <Card className="p-4 border border-indigo-100 bg-gradient-to-br from-blue-50 to-white transform transition-all duration-300 hover:shadow-lg hover:translate-y-[-3px] animate-fade-in" style={{ animationDelay: "0.2s" }}>
             <h4 className="text-sm font-medium text-blue-500 mb-2">Students</h4>
             <div className="flex items-end">
               <span className="text-3xl font-bold text-blue-700">{overallStats.studentsCount}</span>
