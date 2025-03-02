@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { LogOut, User, Users, Calendar, CreditCard, BookOpen } from 'lucide-react';
@@ -36,7 +35,7 @@ export const Dashboard = ({ onLogout, user }: DashboardProps) => {
         </div>
       </div>
 
-      <WelcomeMessage userName={user.name} userRole={user.role} />
+      <WelcomeMessage name={user.name} role={user.role} />
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 mt-8">
         {isStudent && (
