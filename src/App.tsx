@@ -52,7 +52,7 @@ function App() {
         } />
 
         <Route path="/course-materials" element={
-          loggedInUser ? <ProjectManagement user={loggedInUser} /> : <Navigate to="/login" />
+          loggedInUser ? <ProjectManagement /> : <Navigate to="/login" />
         } />
 
         {/* Routes for students */}
@@ -62,7 +62,7 @@ function App() {
 
         {/* Routes for students and admin */}
         {loggedInUser && (loggedInUser.role === "student" || loggedInUser.role === "admin") && (
-          <Route path="/fees" element={<AdminFees isAdmin={loggedInUser.role === "admin"} studentEmail={loggedInUser.role === "student" ? loggedInUser.email : undefined} />} />
+          <Route path="/fees" element={<AdminFees />} />
         )}
 
         {/* Routes for admin only */}
