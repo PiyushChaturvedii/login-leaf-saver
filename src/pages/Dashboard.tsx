@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -462,8 +461,8 @@ const Dashboard = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className={`animate-fade-in ${isAnimating ? 'opacity-0' : 'opacity-100'} transition-opacity duration-500`}>
           <WelcomeMessage
-            name={userData.name}
-            role={userData.role}
+            userName={userData.name}
+            userRole={userData.role}
             message={userData.role === 'student' ? 
               `Your next project is due soon. Don't forget to submit it before the deadline!` :
               undefined}
