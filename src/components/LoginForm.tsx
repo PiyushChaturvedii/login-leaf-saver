@@ -45,9 +45,9 @@ export const LoginForm = ({ onLogin }: LoginFormProps) => {
         u.email === email && u.password === password
       );
       
-      console.log("Found user:", user);
-
       if (user) {
+        console.log("Found user:", user);
+        
         // Admin users can bypass the approval check
         if (!user.approved && user.role !== 'admin') {
           toast.error("Your account is pending admin approval!");
@@ -69,6 +69,7 @@ export const LoginForm = ({ onLogin }: LoginFormProps) => {
         toast.success("Login successful!");
         onLogin(userData);
       } else {
+        console.log("No matching user found");
         toast.error("Invalid credentials!");
       }
     } catch (error) {
