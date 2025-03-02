@@ -67,7 +67,7 @@ export const Dashboard = ({ onLogout, user }: DashboardProps) => {
           <CardFooter>
             <Link to="/attendance" className="w-full">
               <Button className="w-full">
-                {isInstructor ? "Take Attendance" : "View Attendance"}
+                {isInstructor || isAdmin ? "Take Attendance" : "View Attendance"}
               </Button>
             </Link>
           </CardFooter>
@@ -83,7 +83,9 @@ export const Dashboard = ({ onLogout, user }: DashboardProps) => {
               <CreditCard className="w-12 h-12 text-primary mx-auto" />
             </CardContent>
             <CardFooter>
-              <Button className="w-full" disabled>Coming Soon</Button>
+              <Link to="/fees" className="w-full">
+                <Button className="w-full">{isAdmin ? "Manage Fees" : "View Payments"}</Button>
+              </Link>
             </CardFooter>
           </Card>
         )}
@@ -98,7 +100,9 @@ export const Dashboard = ({ onLogout, user }: DashboardProps) => {
               <Users className="w-12 h-12 text-primary mx-auto" />
             </CardContent>
             <CardFooter>
-              <Button className="w-full" disabled>Coming Soon</Button>
+              <Link to="/user-management" className="w-full">
+                <Button className="w-full">Manage Users</Button>
+              </Link>
             </CardFooter>
           </Card>
         )}
@@ -112,7 +116,9 @@ export const Dashboard = ({ onLogout, user }: DashboardProps) => {
             <BookOpen className="w-12 h-12 text-primary mx-auto" />
           </CardContent>
           <CardFooter>
-            <Button className="w-full" disabled>Coming Soon</Button>
+            <Link to="/course-materials" className="w-full">
+              <Button className="w-full">Access Materials</Button>
+            </Link>
           </CardFooter>
         </Card>
       </div>
