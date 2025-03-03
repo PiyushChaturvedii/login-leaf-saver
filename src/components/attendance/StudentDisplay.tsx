@@ -11,22 +11,18 @@ import { StudentSubmissionForm } from './StudentSubmissionForm';
 import { AttendanceStats } from './AttendanceStats';
 import { StudentCalendarView } from './StudentCalendarView';
 import { StudentListView } from './StudentListView';
-import { AttendanceCode, StudentStats } from './types';
+import { useAttendance } from './context/AttendanceContext';
 
-interface StudentDisplayProps {
-  stats: StudentStats;
-  submittedCode: string;
-  setSubmittedCode: (code: string) => void;
-  submitAttendance: (e: React.FormEvent) => void;
-}
-
-export const StudentDisplay = ({
-  stats,
-  submittedCode,
-  setSubmittedCode,
-  submitAttendance
-}: StudentDisplayProps) => {
+export const StudentDisplay = () => {
+  const { 
+    submittedCode, 
+    setSubmittedCode, 
+    submitAttendance,
+    getStudentStats
+  } = useAttendance();
+  
   const [selectedMonth, setSelectedMonth] = useState<Date>(new Date());
+  const stats = getStudentStats('currentUser');
   
   return (
     <>

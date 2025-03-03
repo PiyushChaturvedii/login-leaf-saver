@@ -2,7 +2,6 @@
 import { useState } from 'react';
 import { Card } from "@/components/ui/card";
 import { PieChart, CalendarIcon, Users } from 'lucide-react';
-import { Progress } from "@/components/ui/progress";
 import {
   Tabs,
   TabsContent,
@@ -13,47 +12,31 @@ import { AttendanceCodeGenerator } from './AttendanceCodeGenerator';
 import { AttendanceStats } from './AttendanceStats';
 import { InstructorCalendarView } from './InstructorCalendarView';
 import { StudentsListView } from './StudentsListView';
-import { AttendanceCode, StudentStats } from './types';
+import { useAttendance } from './context/AttendanceContext';
 
-interface InstructorDisplayProps {
-  overallStats: { averageAttendance: number, totalSessions: number, studentsCount: number };
-  attendanceCode: AttendanceCode | null;
-  timeLeft: { minutes: number, seconds: number } | null;
-  sessionDate: Date | undefined;
-  sessionName: string;
-  setSessionDate: (date: Date | undefined) => void;
-  setSessionName: (name: string) => void;
-  generateAttendanceCode: () => void;
-  getStudentStats: (email: string) => StudentStats;
-  handleManualAttendance: (email: string, date: string, sessionName?: string) => void;
-  handleEditAttendance: (id: string, email: string, present: boolean) => void;
-  getAttendanceId: (email: string, date: string, sessionName?: string) => string;
-  getAllStudentEmails: () => string[];
-  getDaysWithSessions: () => Date[];
-  getSessionsForDate: (date: Date) => string[];
-  isDateInMonth: (date: Date, month: Date) => boolean;
-}
+export const InstructorDisplay = () => {
+  const { 
+    attendanceCode,
+    timeLeft,
+    sessionDate,
+    sessionName,
+    setSessionDate,
+    setSessionName,
+    generateAttendanceCode,
+    getStudentStats,
+    handleManualAttendance,
+    handleEditAttendance,
+    getAttendanceId,
+    getAllStudentEmails,
+    getDaysWithSessionsData,
+    getSessionsForDateData,
+    isDateInMonthCheck,
+    getOverallStatsData
+  } = useAttendance();
 
-export const InstructorDisplay = ({
-  overallStats,
-  attendanceCode,
-  timeLeft,
-  sessionDate,
-  sessionName,
-  setSessionDate,
-  setSessionName,
-  generateAttendanceCode,
-  getStudentStats,
-  handleManualAttendance,
-  handleEditAttendance,
-  getAttendanceId,
-  getAllStudentEmails,
-  getDaysWithSessions,
-  getSessionsForDate,
-  isDateInMonth
-}: InstructorDisplayProps) => {
   const [selectedTab, setSelectedTab] = useState("overview");
   const [selectedMonth, setSelectedMonth] = useState<Date>(new Date());
+  const overallStats = getOverallStatsData();
 
   return (
     <>
@@ -128,9 +111,9 @@ export const InstructorDisplay = ({
           setSessionDate={setSessionDate}
           selectedMonth={selectedMonth}
           setSelectedMonth={setSelectedMonth}
-          getDaysWithSessions={getDaysWithSessions}
-          getSessionsForDate={getSessionsForDate}
-          isDateInMonth={isDateInMonth}
+          getDaysWithSessions={getDaysWithSessionsData}
+          getSessionsForDate={getSessionsForDateData}
+          isDateInMonth={isDateInMonthCheck}
         />
       </TabsContent>
       
@@ -148,3 +131,6 @@ export const InstructorDisplay = ({
     </>
   );
 };
+
+// Need to import Progress from UI components
+import { Progress } from "@/components/ui/progress";
