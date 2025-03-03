@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -6,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Progress } from "@/components/ui/progress";
-import { CreditCard, Receipt, Calendar, CheckCircle, AlertCircle, Clock, DownloadCloud } from "lucide-react";
+import { CreditCard, Receipt, Calendar, CheckCircle, AlertCircle, Clock, DownloadCloud, Edit, ArrowLeft } from "lucide-react";
+import { Link } from 'react-router-dom';
 
 interface UserData {
   email: string;
@@ -34,6 +34,7 @@ interface UserData {
 export const AdminFees = () => {
   const [feesAmount, setFeesAmount] = useState<number>(0);
   const [selectedEmiPlan, setSelectedEmiPlan] = useState<string>("3");
+  const [editingUser, setEditingUser] = useState<string | null>(null);
 
   const calculateGST = (amount: number) => {
     return amount * 0.18; // 18% GST
@@ -142,11 +143,72 @@ export const AdminFees = () => {
     return <AlertCircle className="w-5 h-5 text-red-500" />;
   };
 
+  const handleEditFees = (studentEmail: string) => {
+    setEditingUser(studentEmail);
+    
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const user = users.find((u: UserData) => u.email === studentEmail);
+    
+    if (user?.fees) {
+      setFeesAmount(user.fees.amount);
+      if (user.fees.emiPlan) {
+        setSelectedEmiPlan(user.fees.emiPlan.totalEmis.toString());
+      }
+    }
+  };
+
+  const handleUpdateFees = (studentEmail: string, baseAmount: number, emiPlan: number) => {
+    const gstAmount = calculateGST(baseAmount);
+    const totalAmount = baseAmount + gstAmount;
+    const emiAmount = calculateEmiAmount(totalAmount, emiPlan);
+
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const user = users.find((u: UserData) => u.email === studentEmail);
+    
+    const paidAmount = user?.fees?.paid || 0;
+    const paidEmis = user?.fees?.emiPlan?.paidEmis || 0;
+    
+    const updatedUsers = users.map((user: UserData) =>
+      user.email === studentEmail
+        ? {
+            ...user,
+            fees: {
+              amount: baseAmount,
+              gstAmount: gstAmount,
+              totalAmount: totalAmount,
+              paid: paidAmount,
+              payments: user.fees?.payments || [],
+              lastPaid: user.fees?.lastPaid,
+              emiPlan: {
+                totalEmis: emiPlan,
+                paidEmis: paidEmis,
+                emiAmount: emiAmount
+              }
+            },
+          }
+        : user
+    );
+    
+    localStorage.setItem('users', JSON.stringify(updatedUsers));
+    toast.success('Fees updated successfully!');
+    setEditingUser(null);
+  };
+
   return (
     <div className="space-y-6">
+      <div className="flex items-center mb-4">
+        <Link to="/dashboard">
+          <Button variant="ghost" size="icon" className="mr-2 rounded-full">
+            <ArrowLeft className="w-5 h-5" />
+            <span className="sr-only">Back to Dashboard</span>
+          </Button>
+        </Link>
+        <h1 className="text-2xl font-bold">Fees Management</h1>
+      </div>
+      
       <Card className="bg-white shadow-md border-none">
         <CardHeader className="pb-2">
-          <CardTitle className="text-xl font-bold text-gray-800">Fees Management</CardTitle>
+          <CardTitle className="text-xl font-bold text-gray-800">Student Fees</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-6">
@@ -173,9 +235,11 @@ export const AdminFees = () => {
                       )}
                     </div>
 
-                    {!student.fees?.emiPlan ? (
+                    {(!student.fees?.emiPlan || editingUser === student.email) ? (
                       <div className="space-y-5 p-4 bg-gray-50 rounded-lg">
-                        <h5 className="font-medium text-gray-800">Register Course Fees</h5>
+                        <h5 className="font-medium text-gray-800">
+                          {editingUser === student.email ? "Update Course Fees" : "Register Course Fees"}
+                        </h5>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
                             <label className="text-sm font-medium text-gray-600 mb-1 block">Base Amount (₹)</label>
@@ -185,13 +249,14 @@ export const AdminFees = () => {
                                 type="number"
                                 className="pl-7"
                                 placeholder="Enter base amount"
+                                value={feesAmount || ''}
                                 onChange={(e) => setFeesAmount(Number(e.target.value))}
                               />
                             </div>
                           </div>
                           <div>
                             <label className="text-sm font-medium text-gray-600 mb-1 block">EMI Plan</label>
-                            <Select defaultValue={selectedEmiPlan} onValueChange={setSelectedEmiPlan}>
+                            <Select value={selectedEmiPlan} onValueChange={setSelectedEmiPlan}>
                               <SelectTrigger>
                                 <SelectValue placeholder="Select EMI plan" />
                               </SelectTrigger>
@@ -203,16 +268,48 @@ export const AdminFees = () => {
                             </Select>
                           </div>
                         </div>
-                        <Button 
-                          onClick={() => handleFeesRegistration(student.email, feesAmount, parseInt(selectedEmiPlan))}
-                          className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
-                        >
-                          <CreditCard className="mr-2 h-4 w-4" />
-                          Register Fees
-                        </Button>
+                        <div className="flex gap-2">
+                          {editingUser === student.email ? (
+                            <>
+                              <Button 
+                                onClick={() => handleUpdateFees(student.email, feesAmount, parseInt(selectedEmiPlan))}
+                                className="flex-1 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+                              >
+                                <CreditCard className="mr-2 h-4 w-4" />
+                                Update Fees
+                              </Button>
+                              <Button 
+                                variant="outline" 
+                                onClick={() => setEditingUser(null)}
+                                className="flex-1"
+                              >
+                                Cancel
+                              </Button>
+                            </>
+                          ) : (
+                            <Button 
+                              onClick={() => handleFeesRegistration(student.email, feesAmount, parseInt(selectedEmiPlan))}
+                              className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+                            >
+                              <CreditCard className="mr-2 h-4 w-4" />
+                              Register Fees
+                            </Button>
+                          )}
+                        </div>
                       </div>
                     ) : (
                       <div className="space-y-6">
+                        <div className="flex justify-end">
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            onClick={() => handleEditFees(student.email)}
+                            className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                          >
+                            <Edit className="w-4 h-4 mr-1" />
+                            Edit Fees
+                          </Button>
+                        </div>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                           <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-none">
                             <CardContent className="pt-6">

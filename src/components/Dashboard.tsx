@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { LogOut, User, Users, Calendar, CreditCard, BookOpen } from 'lucide-react';
+import { LogOut, User, Users, Calendar, CreditCard, BookOpen, ArrowLeft } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { WelcomeMessage } from './WelcomeMessage';
@@ -23,7 +23,15 @@ export const Dashboard = ({ onLogout, user }: DashboardProps) => {
   return (
     <div className="container mx-auto p-4 max-w-6xl">
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold">Academy Dashboard</h1>
+        <div className="flex items-center gap-2">
+          <Link to="/dashboard">
+            <Button variant="ghost" size="icon" className="rounded-full">
+              <ArrowLeft className="w-5 h-5" />
+              <span className="sr-only">Home</span>
+            </Button>
+          </Link>
+          <h1 className="text-3xl font-bold">Academy Dashboard</h1>
+        </div>
         <div className="flex items-center gap-4">
           <div className="text-right">
             <p className="font-medium">{user.name}</p>
