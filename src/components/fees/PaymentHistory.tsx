@@ -1,14 +1,22 @@
 
+/**
+ * PaymentHistory component
+ * Displays a table of previous payments made by the student
+ * Shows date, amount, receipt number, and download option for each payment
+ */
+
 import { Button } from "@/components/ui/button";
 import { DownloadCloud } from "lucide-react";
 import { formatDate } from './FeesUtils';
 import { UserData } from './FeesTypes';
 
 interface PaymentHistoryProps {
+  /** Array of payment records */
   payments: NonNullable<UserData['fees']>['payments'];
 }
 
 export const PaymentHistory = ({ payments }: PaymentHistoryProps) => {
+  // Don't render anything if there are no payments
   if (!payments || payments.length === 0) {
     return null;
   }

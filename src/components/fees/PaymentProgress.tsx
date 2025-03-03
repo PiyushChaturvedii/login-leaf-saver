@@ -1,4 +1,10 @@
 
+/**
+ * PaymentProgress component
+ * Shows a progress bar of fee payment status
+ * Allows admin to record EMI payments for students
+ */
+
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { CheckCircle, AlertCircle, Clock } from "lucide-react";
@@ -7,24 +13,33 @@ import { calculateProgressPercentage, getStatusColor, getStatusIcon } from './Fe
 import { UserData } from './FeesTypes';
 
 interface PaymentProgressProps {
+  /** Student email to identify the student in localStorage */
   studentEmail: string;
+  /** Fee details of the student */
   fees: NonNullable<UserData['fees']>;
 }
 
 export const PaymentProgress = ({ studentEmail, fees }: PaymentProgressProps) => {
+  /**
+   * Handles EMI payment recording
+   * Updates the student data in localStorage with new payment information
+   */
   const handleEmiPayment = () => {
     const users = JSON.parse(localStorage.getItem('users') || '[]');
     const user = users.find((u: UserData) => u.email === studentEmail);
     
+    // Validate if EMI payment is possible
     if (!user?.fees?.emiPlan || user.fees.emiPlan.paidEmis >= user.fees.emiPlan.totalEmis) {
       toast.error('No pending EMIs or EMI plan not set!');
       return;
     }
 
+    // Generate receipt number, payment date and amount
     const receipt = `RCT-${new Date().getTime().toString().substring(7)}`;
     const paymentDate = new Date().toISOString();
     const paymentAmount = user.fees.emiPlan.emiAmount;
 
+    // Update user data with new payment information
     const updatedUsers = users.map((u: UserData) =>
       u.email === studentEmail
         ? {
@@ -50,10 +65,15 @@ export const PaymentProgress = ({ studentEmail, fees }: PaymentProgressProps) =>
         : u
     );
 
+    // Save updated data to localStorage
     localStorage.setItem('users', JSON.stringify(updatedUsers));
     toast.success('EMI payment recorded successfully!');
   };
 
+  /**
+   * Renders the appropriate status icon based on payment progress
+   * @returns React element representing the status icon
+   */
   const renderStatusIcon = () => {
     const iconType = getStatusIcon(fees.paid, fees.totalAmount);
     if (iconType === "check-circle") {
@@ -82,6 +102,7 @@ export const PaymentProgress = ({ studentEmail, fees }: PaymentProgressProps) =>
         <span>₹{(fees.totalAmount - fees.paid).toLocaleString('en-IN')} remaining</span>
       </div>
       
+      {/* Only show payment button if there are unpaid EMIs */}
       {fees.emiPlan.paidEmis < fees.emiPlan.totalEmis && (
         <Button 
           onClick={handleEmiPayment}

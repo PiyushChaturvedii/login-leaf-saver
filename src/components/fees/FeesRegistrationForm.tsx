@@ -1,4 +1,10 @@
 
+/**
+ * FeesRegistrationForm component
+ * Form for registering or updating student fees
+ * Allows setting base amount and EMI plan
+ */
+
 import { useState, useEffect } from 'react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -9,11 +15,17 @@ import { calculateGST, calculateEmiAmount } from './FeesUtils';
 import { UserData } from './FeesTypes';
 
 interface FeesRegistrationFormProps {
+  /** Student email to identify the student in localStorage */
   studentEmail: string;
+  /** Initial base amount value (for editing mode) */
   initialAmount?: number;
+  /** Initial EMI plan value (for editing mode) */
   initialEmiPlan?: string;
+  /** Whether the form is in editing mode */
   isEditing: boolean;
+  /** Callback when edit is canceled */
   onCancel?: () => void;
+  /** Callback when registration or update is completed */
   onComplete: () => void;
 }
 
@@ -25,14 +37,20 @@ export const FeesRegistrationForm = ({
   onCancel,
   onComplete
 }: FeesRegistrationFormProps) => {
+  // Form state
   const [feesAmount, setFeesAmount] = useState<number>(initialAmount);
   const [selectedEmiPlan, setSelectedEmiPlan] = useState<string>(initialEmiPlan);
 
+  // Update state when props change
   useEffect(() => {
     setFeesAmount(initialAmount);
     setSelectedEmiPlan(initialEmiPlan);
   }, [initialAmount, initialEmiPlan]);
 
+  /**
+   * Handles initial fees registration
+   * Creates new fees record for student
+   */
   const handleFeesRegistration = () => {
     const gstAmount = calculateGST(feesAmount);
     const totalAmount = feesAmount + gstAmount;
@@ -64,6 +82,10 @@ export const FeesRegistrationForm = ({
     onComplete();
   };
 
+  /**
+   * Handles fees update
+   * Updates existing fees record while preserving payment history
+   */
   const handleUpdateFees = () => {
     const gstAmount = calculateGST(feesAmount);
     const totalAmount = feesAmount + gstAmount;
@@ -72,6 +94,7 @@ export const FeesRegistrationForm = ({
     const users = JSON.parse(localStorage.getItem('users') || '[]');
     const user = users.find((u: UserData) => u.email === studentEmail);
     
+    // Preserve existing payment data
     const paidAmount = user?.fees?.paid || 0;
     const paidEmis = user?.fees?.emiPlan?.paidEmis || 0;
     

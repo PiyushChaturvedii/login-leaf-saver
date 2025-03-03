@@ -1,9 +1,16 @@
 
+/**
+ * FeesOverview component
+ * Shows a summary of fee details in a grid of cards
+ * Displays course fee, total amount, and EMI plan information
+ */
+
 import { Card, CardContent } from "@/components/ui/card";
 import { CreditCard, Receipt, Calendar } from "lucide-react";
 import { UserData } from './FeesTypes';
 
 interface FeesOverviewProps {
+  /** Fee details of the user */
   fees: NonNullable<UserData['fees']>;
 }
 

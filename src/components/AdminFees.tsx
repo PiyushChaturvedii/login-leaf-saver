@@ -1,4 +1,9 @@
 
+/**
+ * AdminFees component - Main page for fees management
+ * Shows a list of all students with their fee details
+ */
+
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";

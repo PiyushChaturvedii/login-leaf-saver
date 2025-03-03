@@ -1,4 +1,11 @@
 
+/**
+ * StudentFeeCard component
+ * Card displaying a student's fee details
+ * Shows fee overview, payment progress, and payment history
+ * Allows editing fee details
+ */
+
 import { useState } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,20 +17,34 @@ import { PaymentHistory } from './PaymentHistory';
 import { UserData } from './FeesTypes';
 
 interface StudentFeeCardProps {
+  /** Student data with fee details */
   student: UserData;
 }
 
 export const StudentFeeCard = ({ student }: StudentFeeCardProps) => {
+  // State to control fee editing mode
   const [editingFees, setEditingFees] = useState(false);
 
+  /**
+   * Handles click on Edit Fees button
+   * Enables editing mode
+   */
   const handleEditFees = () => {
     setEditingFees(true);
   };
 
+  /**
+   * Handles cancellation of fee editing
+   * Disables editing mode without saving changes
+   */
   const handleCancelEdit = () => {
     setEditingFees(false);
   };
 
+  /**
+   * Handles completion of fee update
+   * Disables editing mode after successful update
+   */
   const handleUpdateComplete = () => {
     setEditingFees(false);
   };
@@ -37,6 +58,7 @@ export const StudentFeeCard = ({ student }: StudentFeeCardProps) => {
             <p className="text-sm text-gray-600">{student.email}</p>
           </div>
           
+          {/* Payment status badge - only show if fees are set and not in editing mode */}
           {student.fees?.emiPlan && !editingFees && (
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-gray-100">
               {student.fees.paid >= student.fees.totalAmount 
@@ -59,6 +81,7 @@ export const StudentFeeCard = ({ student }: StudentFeeCardProps) => {
           )}
         </div>
 
+        {/* Show registration form if fees not set or editing mode is active */}
         {(!student.fees?.emiPlan || editingFees) ? (
           <FeesRegistrationForm 
             studentEmail={student.email}
