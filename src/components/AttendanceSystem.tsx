@@ -1,6 +1,9 @@
 
 import { useState, useEffect } from 'react';
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
+import { Link } from 'react-router-dom';
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { Progress } from "@/components/ui/progress";
@@ -197,6 +200,17 @@ export const AttendanceSystem = ({ isInstructor, userEmail }: AttendanceProps) =
 
   return (
     <Card className="p-6 bg-white shadow-lg rounded-xl border-indigo-100">
+      {/* Add dashboard navigation button */}
+      <div className="flex items-center mb-4">
+        <Link to="/dashboard">
+          <Button variant="ghost" size="icon" className="mr-2 rounded-full">
+            <ArrowLeft className="w-5 h-5" />
+            <span className="sr-only">Back to Dashboard</span>
+          </Button>
+        </Link>
+        <h1 className="text-2xl font-bold">Attendance System</h1>
+      </div>
+
       {isInstructor ? (
         <InstructorDisplay
           overallStats={getOverallStats(getAllStudentEmails(), attendances)}
@@ -218,17 +232,12 @@ export const AttendanceSystem = ({ isInstructor, userEmail }: AttendanceProps) =
         />
       ) : (
         userEmail && (
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-            <h3 className="text-xl font-medium bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-              Student Attendance
-            </h3>
-            <StudentDisplay
-              stats={getStudentAttendanceStats(userEmail, attendances)}
-              submittedCode={submittedCode}
-              setSubmittedCode={setSubmittedCode}
-              submitAttendance={submitAttendance}
-            />
-          </div>
+          <StudentDisplay
+            stats={getStudentAttendanceStats(userEmail, attendances)}
+            submittedCode={submittedCode}
+            setSubmittedCode={setSubmittedCode}
+            submitAttendance={submitAttendance}
+          />
         )
       )}
     </Card>

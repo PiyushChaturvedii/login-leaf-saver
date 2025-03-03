@@ -1,190 +1,152 @@
 
-import { Card } from "@/components/ui/card";
+import { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft, Edit, Trash, Users } from "lucide-react";
+import { Link } from 'react-router-dom';
+import { toast } from "sonner";
+import { Input } from './ui/input';
 
-interface UserData {
+// Define the user type
+interface User {
   email: string;
   name: string;
   role: 'admin' | 'instructor' | 'student';
-  github?: string;
-  linkedin?: string;
-  whatsapp?: string;
-  college?: string;
-  course?: string;
-  fees?: {
-    amount: number;
-    paid: number;
-    lastPaid?: string;
-  };
-}
-
-interface Project {
-  id: string;
-  title: string;
-  deployLink?: string;
-  studentEmail?: string;
-  submittedAt: string;
-  grade?: number;
-  startDate: string;
-  endDate: string;
-  createdBy: string;
-}
-
-interface Attendance {
-  id: string;
-  studentEmail: string;
-  code: string;
-  submittedAt: string;
+  password?: string;
+  fees?: any;
 }
 
 export const SystemReport = () => {
-  const users = JSON.parse(localStorage.getItem('users') || '[]');
-  const projects = JSON.parse(localStorage.getItem('projects') || '[]');
-  const attendances = JSON.parse(localStorage.getItem('attendances') || '[]');
+  const [users, setUsers] = useState<User[]>([]);
+  const [editingUser, setEditingUser] = useState<string | null>(null);
+  const [editName, setEditName] = useState('');
+  const [editRole, setEditRole] = useState<'admin' | 'instructor' | 'student'>('student');
+  
+  useEffect(() => {
+    // Load users from localStorage
+    const storedUsers = JSON.parse(localStorage.getItem('users') || '[]');
+    setUsers(storedUsers);
+  }, []);
 
+  const handleEditUser = (user: User) => {
+    setEditingUser(user.email);
+    setEditName(user.name);
+    setEditRole(user.role);
+  };
+
+  const handleSaveUser = (email: string) => {
+    const updatedUsers = users.map(user => 
+      user.email === email 
+        ? { ...user, name: editName, role: editRole }
+        : user
+    );
+    
+    localStorage.setItem('users', JSON.stringify(updatedUsers));
+    setUsers(updatedUsers);
+    setEditingUser(null);
+    toast.success('User updated successfully');
+  };
+
+  const handleDeleteUser = (email: string) => {
+    if (window.confirm('Are you sure you want to delete this user?')) {
+      const filteredUsers = users.filter(user => user.email !== email);
+      localStorage.setItem('users', JSON.stringify(filteredUsers));
+      setUsers(filteredUsers);
+      toast.success('User deleted successfully');
+    }
+  };
+
+  const cancelEdit = () => {
+    setEditingUser(null);
+  };
+  
   return (
     <div className="space-y-6">
-      <Card className="p-6">
-        <h2 className="text-2xl font-bold mb-4">System Report</h2>
-        
-        {/* Users Summary */}
-        <div className="mb-8">
-          <h3 className="text-xl font-semibold mb-3">Users Overview</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-4 bg-blue-50 rounded-lg">
-              <p className="text-lg font-medium">Total Users</p>
-              <p className="text-3xl font-bold">{users.length}</p>
+      <div className="flex items-center mb-4">
+        <Link to="/dashboard">
+          <Button variant="ghost" size="icon" className="mr-2 rounded-full">
+            <ArrowLeft className="w-5 h-5" />
+            <span className="sr-only">Back to Dashboard</span>
+          </Button>
+        </Link>
+        <h1 className="text-2xl font-bold">User Management</h1>
+      </div>
+      
+      <Card className="bg-white shadow-md">
+        <CardHeader className="pb-2">
+          <CardTitle className="flex items-center">
+            <Users className="mr-2 h-5 w-5" />
+            <span>All Users</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="bg-slate-100 p-3 rounded-md grid grid-cols-12 font-medium">
+              <div className="col-span-3">Name</div>
+              <div className="col-span-4">Email</div>
+              <div className="col-span-3">Role</div>
+              <div className="col-span-2 text-right">Actions</div>
             </div>
-            <div className="p-4 bg-green-50 rounded-lg">
-              <p className="text-lg font-medium">Students</p>
-              <p className="text-3xl font-bold">
-                {users.filter((u: UserData) => u.role === 'student').length}
-              </p>
-            </div>
-            <div className="p-4 bg-purple-50 rounded-lg">
-              <p className="text-lg font-medium">Instructors</p>
-              <p className="text-3xl font-bold">
-                {users.filter((u: UserData) => u.role === 'instructor').length}
-              </p>
-            </div>
+            
+            {users.map((user) => (
+              <div key={user.email} className="bg-white p-3 rounded-md shadow-sm border grid grid-cols-12 items-center">
+                {editingUser === user.email ? (
+                  <>
+                    <div className="col-span-3">
+                      <Input 
+                        value={editName} 
+                        onChange={(e) => setEditName(e.target.value)}
+                      />
+                    </div>
+                    <div className="col-span-4">{user.email}</div>
+                    <div className="col-span-3">
+                      <select 
+                        value={editRole}
+                        onChange={(e) => setEditRole(e.target.value as 'admin' | 'instructor' | 'student')}
+                        className="w-full p-2 border rounded"
+                      >
+                        <option value="admin">Admin</option>
+                        <option value="instructor">Instructor</option>
+                        <option value="student">Student</option>
+                      </select>
+                    </div>
+                    <div className="col-span-2 flex justify-end space-x-1">
+                      <Button size="sm" onClick={() => handleSaveUser(user.email)}>
+                        Save
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={cancelEdit}>
+                        Cancel
+                      </Button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="col-span-3">{user.name}</div>
+                    <div className="col-span-4">{user.email}</div>
+                    <div className="col-span-3 capitalize">{user.role}</div>
+                    <div className="col-span-2 flex justify-end space-x-1">
+                      <Button 
+                        size="icon" 
+                        variant="ghost" 
+                        onClick={() => handleEditUser(user)}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button 
+                        size="icon" 
+                        variant="ghost" 
+                        className="text-red-500 hover:text-red-700"
+                        onClick={() => handleDeleteUser(user.email)}
+                      >
+                        <Trash className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </>
+                )}
+              </div>
+            ))}
           </div>
-        </div>
-
-        {/* Project Stats */}
-        <div className="mb-8">
-          <h3 className="text-xl font-semibold mb-3">Projects Overview</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-4 bg-yellow-50 rounded-lg">
-              <p className="text-lg font-medium">Total Projects</p>
-              <p className="text-3xl font-bold">{projects.length}</p>
-            </div>
-            <div className="p-4 bg-orange-50 rounded-lg">
-              <p className="text-lg font-medium">Submitted Projects</p>
-              <p className="text-3xl font-bold">
-                {projects.filter((p: Project) => p.deployLink).length}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Detailed Reports */}
-        <div className="space-y-6">
-          <div>
-            <h3 className="text-xl font-semibold mb-3">Student Details</h3>
-            <div className="overflow-x-auto">
-              <table className="min-w-full border-collapse border border-gray-200">
-                <thead>
-                  <tr className="bg-gray-50">
-                    <th className="border p-2">Name</th>
-                    <th className="border p-2">Email</th>
-                    <th className="border p-2">College</th>
-                    <th className="border p-2">Course</th>
-                    <th className="border p-2">Fees Paid</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {users
-                    .filter((user: UserData) => user.role === 'student')
-                    .map((student: UserData) => (
-                      <tr key={student.email}>
-                        <td className="border p-2">{student.name}</td>
-                        <td className="border p-2">{student.email}</td>
-                        <td className="border p-2">{student.college || '-'}</td>
-                        <td className="border p-2">{student.course || '-'}</td>
-                        <td className="border p-2">₹{student.fees?.paid || 0}</td>
-                      </tr>
-                    ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <div>
-            <h3 className="text-xl font-semibold mb-3">Project Submissions</h3>
-            <div className="overflow-x-auto">
-              <table className="min-w-full border-collapse border border-gray-200">
-                <thead>
-                  <tr className="bg-gray-50">
-                    <th className="border p-2">Title</th>
-                    <th className="border p-2">Student</th>
-                    <th className="border p-2">Submission Date</th>
-                    <th className="border p-2">Grade</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {projects
-                    .filter((project: Project) => project.deployLink)
-                    .map((project: Project) => (
-                      <tr key={project.id}>
-                        <td className="border p-2">{project.title}</td>
-                        <td className="border p-2">{project.studentEmail || '-'}</td>
-                        <td className="border p-2">
-                          {new Date(project.submittedAt).toLocaleDateString()}
-                        </td>
-                        <td className="border p-2">{project.grade || 'Pending'}</td>
-                      </tr>
-                    ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <div>
-            <h3 className="text-xl font-semibold mb-3">Attendance Summary</h3>
-            <div className="overflow-x-auto">
-              <table className="min-w-full border-collapse border border-gray-200">
-                <thead>
-                  <tr className="bg-gray-50">
-                    <th className="border p-2">Student</th>
-                    <th className="border p-2">Sessions Attended</th>
-                    <th className="border p-2">Last Attendance</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {users
-                    .filter((user: UserData) => user.role === 'student')
-                    .map((student: UserData) => {
-                      const studentAttendances = attendances.filter(
-                        (a: Attendance) => a.studentEmail === student.email
-                      );
-                      const lastAttendance = studentAttendances[studentAttendances.length - 1];
-                      
-                      return (
-                        <tr key={student.email}>
-                          <td className="border p-2">{student.name}</td>
-                          <td className="border p-2">{studentAttendances.length}</td>
-                          <td className="border p-2">
-                            {lastAttendance
-                              ? new Date(lastAttendance.submittedAt).toLocaleDateString()
-                              : '-'}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
+        </CardContent>
       </Card>
     </div>
   );
