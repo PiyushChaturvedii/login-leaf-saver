@@ -22,6 +22,7 @@ export const StudentDisplay = () => {
   } = useAttendance();
   
   const [selectedMonth, setSelectedMonth] = useState<Date>(new Date());
+  const [selectedTab, setSelectedTab] = useState("attendance");
   const stats = getStudentStats('currentUser');
   
   return (
@@ -36,7 +37,7 @@ export const StudentDisplay = () => {
         />
       </div>
       
-      <Tabs defaultValue="calendar">
+      <Tabs defaultValue="calendar" value={selectedTab} onValueChange={setSelectedTab}>
         <TabsList className="grid grid-cols-2 w-full">
           <TabsTrigger value="calendar" className="flex items-center">
             <CalendarIcon className="w-4 h-4 mr-2" />

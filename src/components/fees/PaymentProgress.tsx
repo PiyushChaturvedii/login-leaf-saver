@@ -3,14 +3,21 @@
  * PaymentProgress component
  * Shows a progress bar of fee payment status
  * Allows admin to record EMI payments for students
- * Enables editing of EMI amounts
+ * Enables editing of EMI amounts and previous EMI payments
  */
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
-import { CheckCircle, AlertCircle, Clock, Edit } from "lucide-react";
+import { 
+  CheckCircle, 
+  AlertCircle, 
+  Clock, 
+  Edit,
+  Trash2,
+  PlusCircle 
+} from "lucide-react";
 import { toast } from "sonner";
 import { calculateProgressPercentage, getStatusColor, getStatusIcon } from './FeesUtils';
 import { UserData } from './FeesTypes';
@@ -25,6 +32,7 @@ interface PaymentProgressProps {
 export const PaymentProgress = ({ studentEmail, fees }: PaymentProgressProps) => {
   const [isEditingEmi, setIsEditingEmi] = useState(false);
   const [newEmiAmount, setNewEmiAmount] = useState(fees.emiPlan.emiAmount);
+  const [isEditingPayment, setIsEditingPayment] = useState(false);
 
   /**
    * Handles EMI payment recording
@@ -110,6 +118,99 @@ export const PaymentProgress = ({ studentEmail, fees }: PaymentProgressProps) =>
   };
 
   /**
+   * Edits a previous payment
+   * @param index Index of the payment in the payments array
+   * @param newAmount New amount for the payment
+   */
+  const handleEditPayment = (index: number, newAmount: number) => {
+    if (!newAmount || newAmount <= 0) {
+      toast.error('Please enter a valid payment amount');
+      return;
+    }
+
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const user = users.find((u: UserData) => u.email === studentEmail);
+    
+    if (!user?.fees?.payments || user.fees.payments.length <= index) {
+      toast.error('Payment not found!');
+      return;
+    }
+
+    // Calculate the difference in amount
+    const oldAmount = user.fees.payments[index].amount;
+    const amountDifference = newAmount - oldAmount;
+    
+    // Update the payment and total paid amount
+    const updatedPayments = [...user.fees.payments];
+    updatedPayments[index] = {
+      ...updatedPayments[index],
+      amount: newAmount
+    };
+    
+    const updatedUsers = users.map((u: UserData) =>
+      u.email === studentEmail
+        ? {
+            ...u,
+            fees: {
+              ...u.fees!,
+              paid: u.fees!.paid + amountDifference,
+              payments: updatedPayments,
+            },
+          }
+        : u
+    );
+
+    // Save updated data to localStorage
+    localStorage.setItem('users', JSON.stringify(updatedUsers));
+    toast.success('Payment updated successfully!');
+    setIsEditingPayment(false);
+  };
+
+  /**
+   * Removes a previous payment
+   * @param index Index of the payment in the payments array
+   */
+  const handleRemovePayment = (index: number) => {
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const user = users.find((u: UserData) => u.email === studentEmail);
+    
+    if (!user?.fees?.payments || user.fees.payments.length <= index) {
+      toast.error('Payment not found!');
+      return;
+    }
+
+    // Get amount of the payment to be removed
+    const paymentAmount = user.fees.payments[index].amount;
+    
+    // Calculate new paidEmis count
+    const newPaidEmis = Math.max(0, user.fees.emiPlan.paidEmis - 1);
+    
+    // Create new payments array without the removed payment
+    const updatedPayments = user.fees.payments.filter((_, i) => i !== index);
+    
+    const updatedUsers = users.map((u: UserData) =>
+      u.email === studentEmail
+        ? {
+            ...u,
+            fees: {
+              ...u.fees!,
+              paid: Math.max(0, u.fees!.paid - paymentAmount),
+              payments: updatedPayments,
+              emiPlan: {
+                ...u.fees!.emiPlan,
+                paidEmis: newPaidEmis
+              }
+            },
+          }
+        : u
+    );
+
+    // Save updated data to localStorage
+    localStorage.setItem('users', JSON.stringify(updatedUsers));
+    toast.success('Payment removed successfully!');
+  };
+
+  /**
    * Renders the appropriate status icon based on payment progress
    * @returns React element representing the status icon
    */
@@ -188,12 +289,76 @@ export const PaymentProgress = ({ studentEmail, fees }: PaymentProgressProps) =>
         </div>
       </div>
       
+      {/* Payments editing section */}
+      <div className="mt-3 border-t pt-3">
+        <div className="flex justify-between items-center mb-2">
+          <span className="text-sm font-medium">Previous Payments:</span>
+          <Button 
+            size="sm" 
+            variant="outline" 
+            onClick={() => setIsEditingPayment(!isEditingPayment)}
+            className="h-7 text-xs"
+          >
+            {isEditingPayment ? "Done" : "Edit Payments"}
+          </Button>
+        </div>
+        
+        {fees.payments && fees.payments.length > 0 ? (
+          <div className="space-y-2 max-h-40 overflow-y-auto">
+            {fees.payments.map((payment, index) => (
+              <div key={index} className="flex items-center justify-between text-sm p-2 rounded bg-white">
+                <div className="flex-1">
+                  <div className="font-medium">₹{payment.amount.toLocaleString('en-IN')}</div>
+                  <div className="text-xs text-gray-500">{new Date(payment.date).toLocaleDateString()}</div>
+                </div>
+                
+                {isEditingPayment && (
+                  <div className="flex items-center space-x-1">
+                    <Button 
+                      size="icon" 
+                      variant="ghost" 
+                      onClick={() => {
+                        // Create a modal or inline edit form
+                        const newAmount = window.prompt("Enter new payment amount:", payment.amount.toString());
+                        if (newAmount) {
+                          handleEditPayment(index, parseFloat(newAmount));
+                        }
+                      }}
+                      className="h-7 w-7"
+                    >
+                      <Edit className="h-3.5 w-3.5 text-blue-500" />
+                    </Button>
+                    <Button 
+                      size="icon" 
+                      variant="ghost" 
+                      onClick={() => {
+                        if (window.confirm("Are you sure you want to remove this payment?")) {
+                          handleRemovePayment(index);
+                        }
+                      }}
+                      className="h-7 w-7"
+                    >
+                      <Trash2 className="h-3.5 w-3.5 text-red-500" />
+                    </Button>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-sm text-gray-500 italic text-center py-2">
+            No payments recorded yet
+          </div>
+        )}
+      </div>
+      
       {/* Only show payment button if there are unpaid EMIs */}
       {fees.emiPlan.paidEmis < fees.emiPlan.totalEmis && (
         <Button 
           onClick={handleEmiPayment}
           className="w-full mt-4 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
         >
+          <PlusCircle className="w-4 h-4 mr-2" />
           Record EMI Payment
         </Button>
       )}

@@ -13,6 +13,7 @@ import { AttendanceStats } from './AttendanceStats';
 import { InstructorCalendarView } from './InstructorCalendarView';
 import { StudentsListView } from './StudentsListView';
 import { useAttendance } from './context/AttendanceContext';
+import { Progress } from "@/components/ui/progress";
 
 export const InstructorDisplay = () => {
   const { 
@@ -60,77 +61,74 @@ export const InstructorDisplay = () => {
               Students
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="overview" className="space-y-6 mt-0">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Card className="p-4 border border-indigo-100 bg-gradient-to-br from-indigo-50 to-white transform transition-all duration-300 hover:shadow-lg hover:translate-y-[-3px] animate-fade-in">
+                <h4 className="text-sm font-medium text-indigo-500 mb-2">Average Attendance</h4>
+                <div className="flex items-end">
+                  <span className="text-3xl font-bold text-indigo-700">{overallStats.averageAttendance}%</span>
+                  <span className="text-sm text-indigo-400 ml-2 mb-1">of classes</span>
+                </div>
+                <Progress 
+                  value={overallStats.averageAttendance} 
+                  className="h-2 mt-2" 
+                />
+              </Card>
+              
+              <Card className="p-4 border border-indigo-100 bg-gradient-to-br from-purple-50 to-white transform transition-all duration-300 hover:shadow-lg hover:translate-y-[-3px] animate-fade-in" style={{ animationDelay: "0.1s" }}>
+                <h4 className="text-sm font-medium text-purple-500 mb-2">Total Sessions</h4>
+                <div className="flex items-end">
+                  <span className="text-3xl font-bold text-purple-700">{overallStats.totalSessions}</span>
+                  <span className="text-sm text-purple-400 ml-2 mb-1">sessions recorded</span>
+                </div>
+              </Card>
+              
+              <Card className="p-4 border border-indigo-100 bg-gradient-to-br from-blue-50 to-white transform transition-all duration-300 hover:shadow-lg hover:translate-y-[-3px] animate-fade-in" style={{ animationDelay: "0.2s" }}>
+                <h4 className="text-sm font-medium text-blue-500 mb-2">Students</h4>
+                <div className="flex items-end">
+                  <span className="text-3xl font-bold text-blue-700">{overallStats.studentsCount}</span>
+                  <span className="text-sm text-blue-400 ml-2 mb-1">enrolled</span>
+                </div>
+              </Card>
+            </div>
+            
+            <AttendanceCodeGenerator
+              attendanceCode={attendanceCode}
+              timeLeft={timeLeft}
+              sessionDate={sessionDate}
+              sessionName={sessionName}
+              setSessionDate={setSessionDate}
+              setSessionName={setSessionName}
+              generateAttendanceCode={generateAttendanceCode}
+            />
+          </TabsContent>
+          
+          <TabsContent value="calendar" className="mt-0">
+            <InstructorCalendarView
+              sessionDate={sessionDate}
+              setSessionDate={setSessionDate}
+              selectedMonth={selectedMonth}
+              setSelectedMonth={setSelectedMonth}
+              getDaysWithSessions={getDaysWithSessionsData}
+              getSessionsForDate={getSessionsForDateData}
+              isDateInMonth={isDateInMonthCheck}
+            />
+          </TabsContent>
+          
+          <TabsContent value="students" className="mt-0">
+            <StudentsListView
+              students={getAllStudentEmails()}
+              getStudentStats={getStudentStats}
+              handleManualAttendance={handleManualAttendance}
+              handleEditAttendance={handleEditAttendance}
+              sessionDate={sessionDate}
+              sessionName={sessionName}
+              getAttendanceId={getAttendanceId}
+            />
+          </TabsContent>
         </Tabs>
       </div>
-      
-      <TabsContent value="overview" className="space-y-6 mt-0">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="p-4 border border-indigo-100 bg-gradient-to-br from-indigo-50 to-white transform transition-all duration-300 hover:shadow-lg hover:translate-y-[-3px] animate-fade-in">
-            <h4 className="text-sm font-medium text-indigo-500 mb-2">Average Attendance</h4>
-            <div className="flex items-end">
-              <span className="text-3xl font-bold text-indigo-700">{overallStats.averageAttendance}%</span>
-              <span className="text-sm text-indigo-400 ml-2 mb-1">of classes</span>
-            </div>
-            <Progress 
-              value={overallStats.averageAttendance} 
-              className="h-2 mt-2" 
-            />
-          </Card>
-          
-          <Card className="p-4 border border-indigo-100 bg-gradient-to-br from-purple-50 to-white transform transition-all duration-300 hover:shadow-lg hover:translate-y-[-3px] animate-fade-in" style={{ animationDelay: "0.1s" }}>
-            <h4 className="text-sm font-medium text-purple-500 mb-2">Total Sessions</h4>
-            <div className="flex items-end">
-              <span className="text-3xl font-bold text-purple-700">{overallStats.totalSessions}</span>
-              <span className="text-sm text-purple-400 ml-2 mb-1">sessions recorded</span>
-            </div>
-          </Card>
-          
-          <Card className="p-4 border border-indigo-100 bg-gradient-to-br from-blue-50 to-white transform transition-all duration-300 hover:shadow-lg hover:translate-y-[-3px] animate-fade-in" style={{ animationDelay: "0.2s" }}>
-            <h4 className="text-sm font-medium text-blue-500 mb-2">Students</h4>
-            <div className="flex items-end">
-              <span className="text-3xl font-bold text-blue-700">{overallStats.studentsCount}</span>
-              <span className="text-sm text-blue-400 ml-2 mb-1">enrolled</span>
-            </div>
-          </Card>
-        </div>
-        
-        <AttendanceCodeGenerator
-          attendanceCode={attendanceCode}
-          timeLeft={timeLeft}
-          sessionDate={sessionDate}
-          sessionName={sessionName}
-          setSessionDate={setSessionDate}
-          setSessionName={setSessionName}
-          generateAttendanceCode={generateAttendanceCode}
-        />
-      </TabsContent>
-      
-      <TabsContent value="calendar" className="mt-0">
-        <InstructorCalendarView
-          sessionDate={sessionDate}
-          setSessionDate={setSessionDate}
-          selectedMonth={selectedMonth}
-          setSelectedMonth={setSelectedMonth}
-          getDaysWithSessions={getDaysWithSessionsData}
-          getSessionsForDate={getSessionsForDateData}
-          isDateInMonth={isDateInMonthCheck}
-        />
-      </TabsContent>
-      
-      <TabsContent value="students" className="mt-0">
-        <StudentsListView
-          students={getAllStudentEmails()}
-          getStudentStats={getStudentStats}
-          handleManualAttendance={handleManualAttendance}
-          handleEditAttendance={handleEditAttendance}
-          sessionDate={sessionDate}
-          sessionName={sessionName}
-          getAttendanceId={getAttendanceId}
-        />
-      </TabsContent>
     </>
   );
 };
-
-// Need to import Progress from UI components
-import { Progress } from "@/components/ui/progress";
