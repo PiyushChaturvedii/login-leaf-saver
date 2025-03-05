@@ -12,6 +12,13 @@ interface ContentContainerProps {
   userData: {
     role: string;
     email: string;
+    name: string; // Added the required name property
+    photo?: string;
+    college?: string;
+    course?: string;
+    github?: string;
+    linkedin?: string;
+    whatsapp?: string;
   };
   isAnimating: boolean;
 }

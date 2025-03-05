@@ -3,13 +3,17 @@ import React from 'react';
 import { LogOut, BookOpen, Users, BarChart4, FileText, Calendar, GraduationCap, CheckSquare } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 
+// Define the type for dashboard tabs
+type DashboardTab = 'projects' | 'profile' | 'attendance' | 'students' | 'fees' | 'users' | 'report';
+
 interface MobileMenuProps {
   isOpen: boolean;
   userData: {
+    name: string;
     role: string;
   };
-  activeTab: string;
-  setActiveTab: (tab: string) => void;
+  activeTab: DashboardTab;
+  setActiveTab: (tab: DashboardTab) => void;
   closeMobileMenu: () => void;
   handleLogout: () => void;
 }
@@ -22,109 +26,128 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
   closeMobileMenu,
   handleLogout
 }) => {
+  if (!isOpen) return null;
+  
   const isAdmin = userData.role === 'admin';
   const isInstructor = userData.role === 'instructor';
   const isStudent = userData.role === 'student';
-
-  const handleTabChange = (tab: string) => {
+  
+  const handleTabClick = (tab: DashboardTab) => {
     setActiveTab(tab);
     closeMobileMenu();
   };
-
-  if (!isOpen) return null;
-
+  
   return (
-    <div className="md:hidden bg-white shadow-lg rounded-b-lg animate-fade-in">
-      <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-        <Button 
-          variant={activeTab === 'projects' ? "default" : "ghost"} 
-          onClick={() => handleTabChange('projects')}
-          className="w-full justify-start"
-        >
-          <BookOpen className="w-4 h-4 mr-2" />
-          Projects
-        </Button>
-        
-        {isAdmin && (
-          <>
+    <div className="fixed inset-0 z-20 bg-black bg-opacity-50 md:hidden">
+      <div className="relative w-3/4 max-w-sm h-full bg-white shadow-xl overflow-y-auto p-6">
+        <div className="space-y-6">
+          <div className="border-b pb-4">
+            <p className="font-medium text-lg">{userData.name}</p>
+            <p className="text-sm text-gray-500 capitalize">{userData.role}</p>
+          </div>
+          
+          <div className="space-y-2">
             <Button 
-              variant={activeTab === 'users' ? "default" : "ghost"}
-              onClick={() => handleTabChange('users')}
+              variant={activeTab === 'projects' ? "default" : "ghost"} 
+              onClick={() => handleTabClick('projects')}
               className="w-full justify-start"
             >
-              <Users className="w-4 h-4 mr-2" />
-              Users
+              <BookOpen className="w-4 h-4 mr-2" />
+              <span>Projects</span>
             </Button>
-            <Button 
-              variant={activeTab === 'fees' ? "default" : "ghost"}
-              onClick={() => handleTabChange('fees')}
-              className="w-full justify-start"
-            >
-              <BarChart4 className="w-4 h-4 mr-2" />
-              Fees
-            </Button>
-            <Button 
-              variant={activeTab === 'report' ? "default" : "ghost"}
-              onClick={() => handleTabChange('report')}
-              className="w-full justify-start"
-            >
-              <FileText className="w-4 h-4 mr-2" />
-              Report
-            </Button>
-          </>
-        )}
-        
-        {isInstructor && (
-          <>
-            <Button 
-              variant={activeTab === 'attendance' ? "default" : "ghost"}
-              onClick={() => handleTabChange('attendance')}
-              className="w-full justify-start"
-            >
-              <Calendar className="w-4 h-4 mr-2" />
-              Attendance
-            </Button>
-            <Button 
-              variant={activeTab === 'report' ? "default" : "ghost"}
-              onClick={() => handleTabChange('report')}
-              className="w-full justify-start"
-            >
-              <FileText className="w-4 h-4 mr-2" />
-              Report
-            </Button>
-          </>
-        )}
-        
-        {isStudent && (
-          <>
-            <Button 
-              variant={activeTab === 'profile' ? "default" : "ghost"}
-              onClick={() => handleTabChange('profile')}
-              className="w-full justify-start"
-            >
-              <GraduationCap className="w-4 h-4 mr-2" />
-              Profile
-            </Button>
-            <Button 
-              variant={activeTab === 'attendance' ? "default" : "ghost"}
-              onClick={() => handleTabChange('attendance')}
-              className="w-full justify-start"
-            >
-              <CheckSquare className="w-4 h-4 mr-2" />
-              Attendance
-            </Button>
-          </>
-        )}
-        
-        <Button 
-          variant="outline" 
-          onClick={handleLogout} 
-          className="w-full justify-start text-red-500 hover:text-red-700 hover:bg-red-50"
-        >
-          <LogOut className="w-4 h-4 mr-2" />
-          Logout
-        </Button>
+            
+            {isAdmin && (
+              <>
+                <Button 
+                  variant={activeTab === 'users' ? "default" : "ghost"}
+                  onClick={() => handleTabClick('users')}
+                  className="w-full justify-start"
+                >
+                  <Users className="w-4 h-4 mr-2" />
+                  <span>Users</span>
+                </Button>
+                <Button 
+                  variant={activeTab === 'fees' ? "default" : "ghost"}
+                  onClick={() => handleTabClick('fees')}
+                  className="w-full justify-start"
+                >
+                  <BarChart4 className="w-4 h-4 mr-2" />
+                  <span>Fees</span>
+                </Button>
+                <Button 
+                  variant={activeTab === 'report' ? "default" : "ghost"}
+                  onClick={() => handleTabClick('report')}
+                  className="w-full justify-start"
+                >
+                  <FileText className="w-4 h-4 mr-2" />
+                  <span>Report</span>
+                </Button>
+              </>
+            )}
+            
+            {isInstructor && (
+              <>
+                <Button 
+                  variant={activeTab === 'attendance' ? "default" : "ghost"}
+                  onClick={() => handleTabClick('attendance')}
+                  className="w-full justify-start"
+                >
+                  <Calendar className="w-4 h-4 mr-2" />
+                  <span>Attendance</span>
+                </Button>
+                <Button 
+                  variant={activeTab === 'report' ? "default" : "ghost"}
+                  onClick={() => handleTabClick('report')}
+                  className="w-full justify-start"
+                >
+                  <FileText className="w-4 h-4 mr-2" />
+                  <span>Report</span>
+                </Button>
+              </>
+            )}
+            
+            {isStudent && (
+              <>
+                <Button 
+                  variant={activeTab === 'profile' ? "default" : "ghost"}
+                  onClick={() => handleTabClick('profile')}
+                  className="w-full justify-start"
+                >
+                  <GraduationCap className="w-4 h-4 mr-2" />
+                  <span>Profile</span>
+                </Button>
+                <Button 
+                  variant={activeTab === 'attendance' ? "default" : "ghost"}
+                  onClick={() => handleTabClick('attendance')}
+                  className="w-full justify-start"
+                >
+                  <CheckSquare className="w-4 h-4 mr-2" />
+                  <span>Attendance</span>
+                </Button>
+              </>
+            )}
+            
+            <div className="pt-4 border-t mt-4">
+              <Button 
+                variant="ghost" 
+                onClick={() => {
+                  handleLogout();
+                  closeMobileMenu();
+                }}
+                className="w-full justify-start text-red-500 hover:text-red-700 hover:bg-red-50"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                <span>Logout</span>
+              </Button>
+            </div>
+          </div>
+        </div>
       </div>
+      
+      <div 
+        className="absolute inset-0 z-[-1]" 
+        onClick={closeMobileMenu}
+      />
     </div>
   );
 };

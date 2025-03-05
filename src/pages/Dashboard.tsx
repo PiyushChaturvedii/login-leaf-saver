@@ -19,6 +19,9 @@ import { ContentContainer } from "@/components/dashboard/ContentContainer";
 import { useStats } from "@/components/dashboard/hooks/useStats";
 import { toast } from "sonner";
 
+// Define tab type to ensure type safety
+type DashboardTab = 'projects' | 'profile' | 'attendance' | 'students' | 'fees' | 'users' | 'report';
+
 interface UserData {
   email: string;
   name: string;
@@ -34,7 +37,7 @@ interface UserData {
 const Dashboard = () => {
   const navigate = useNavigate();
   const [userData, setUserData] = useState<UserData | null>(null);
-  const [activeTab, setActiveTab] = useState<'projects' | 'profile' | 'attendance' | 'students' | 'fees' | 'users' | 'report'>('projects');
+  const [activeTab, setActiveTab] = useState<DashboardTab>('projects');
   const [isAnimating, setIsAnimating] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -59,6 +62,11 @@ const Dashboard = () => {
     navigate('/');
   };
 
+  // Create a tab change handler that properly types the incoming value
+  const handleTabChange = (tab: DashboardTab) => {
+    setActiveTab(tab);
+  };
+
   const stats = useStats(userData?.role || '', userData?.email || '');
 
   if (!userData) return null;
@@ -68,7 +76,7 @@ const Dashboard = () => {
       <DashboardHeader 
         userData={userData}
         activeTab={activeTab}
-        setActiveTab={setActiveTab}
+        setActiveTab={handleTabChange}
         mobileMenuOpen={mobileMenuOpen}
         setMobileMenuOpen={setMobileMenuOpen}
         handleLogout={handleLogout}
@@ -78,7 +86,7 @@ const Dashboard = () => {
         isOpen={mobileMenuOpen}
         userData={userData}
         activeTab={activeTab}
-        setActiveTab={setActiveTab}
+        setActiveTab={handleTabChange}
         closeMobileMenu={() => setMobileMenuOpen(false)}
         handleLogout={handleLogout}
       />
