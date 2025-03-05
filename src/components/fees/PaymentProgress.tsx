@@ -1,4 +1,3 @@
-
 /**
  * PaymentProgress component
  * Shows a progress bar of fee payment status
