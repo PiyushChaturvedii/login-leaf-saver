@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import { AttendanceProps } from './attendance/types';
 import { StudentDisplay } from './attendance/StudentDisplay';
 import { InstructorDisplay } from './attendance/InstructorDisplay';
-import { AttendanceProvider } from './attendance/context/AttendanceContext';
+import { AttendanceProvider } from './attendance/context/AttendanceProvider';
 
 export const AttendanceSystem = ({ isInstructor, userEmail }: AttendanceProps) => {
   return (

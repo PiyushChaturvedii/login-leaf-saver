@@ -1,12 +1,10 @@
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { 
   Attendance, 
   AttendanceCode,
-  StudentStats,
-  AttendanceRecord
 } from '../types';
 import { 
   getStudentAttendanceStats,
@@ -15,53 +13,22 @@ import {
   getDaysWithSessions,
   isDateInMonth
 } from '../utils';
+import { 
+  AttendanceContextType, 
+  AttendanceProviderProps 
+} from './types';
+import {
+  getAllStudentEmails,
+  getAttendanceId,
+  saveAttendances,
+  loadAttendances,
+  saveAttendanceCode,
+  removeAttendanceCode,
+  loadAttendanceCode,
+  generateNewAttendanceCode
+} from './attendanceUtils';
 
-interface AttendanceContextType {
-  // State
-  attendances: Attendance[];
-  attendanceCode: AttendanceCode | null;
-  submittedCode: string;
-  timeLeft: { minutes: number, seconds: number } | null;
-  sessionDate: Date | undefined;
-  sessionName: string;
-  
-  // Setters
-  setSubmittedCode: (code: string) => void;
-  setSessionDate: (date: Date | undefined) => void;
-  setSessionName: (name: string) => void;
-  
-  // Actions
-  generateAttendanceCode: () => void;
-  submitAttendance: (e: React.FormEvent) => void;
-  handleManualAttendance: (studentEmail: string, date: string, sessionName?: string) => void;
-  handleEditAttendance: (id: string, studentEmail: string, present: boolean) => void;
-  handleDeleteAttendance: (id: string) => void;
-  
-  // Helpers
-  getStudentStats: (email: string) => StudentStats;
-  getAttendanceId: (email: string, date: string, sessionName?: string) => string;
-  getAllStudentEmails: () => string[];
-  getDaysWithSessionsData: () => Date[];
-  getSessionsForDateData: (date: Date) => string[];
-  isDateInMonthCheck: (date: Date, month: Date) => boolean;
-  getOverallStatsData: () => { averageAttendance: number, totalSessions: number, studentsCount: number };
-}
-
-const AttendanceContext = createContext<AttendanceContextType | undefined>(undefined);
-
-export const useAttendance = () => {
-  const context = useContext(AttendanceContext);
-  if (!context) {
-    throw new Error('useAttendance must be used within an AttendanceProvider');
-  }
-  return context;
-};
-
-interface AttendanceProviderProps {
-  children: React.ReactNode;
-  isInstructor: boolean;
-  userEmail?: string;
-}
+export const AttendanceContext = createContext<AttendanceContextType | undefined>(undefined);
 
 export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({ 
   children,
@@ -70,23 +37,18 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
 }) => {
   const [attendanceCode, setAttendanceCode] = useState<AttendanceCode | null>(null);
   const [submittedCode, setSubmittedCode] = useState('');
-  const [attendances, setAttendances] = useState<Attendance[]>(
-    JSON.parse(localStorage.getItem('attendances') || '[]')
-  );
+  const [attendances, setAttendances] = useState<Attendance[]>(loadAttendances());
   const [sessionDate, setSessionDate] = useState<Date | undefined>(new Date());
   const [sessionName, setSessionName] = useState('');
   const [timeLeft, setTimeLeft] = useState<{minutes: number, seconds: number} | null>(null);
 
   useEffect(() => {
     // Load attendance code from localStorage
-    const savedCode = localStorage.getItem('attendanceCode');
-    if (savedCode) {
-      const parsedCode = JSON.parse(savedCode);
-      if (Date.now() < parsedCode.expiresAt) {
-        setAttendanceCode(parsedCode);
-      } else {
-        localStorage.removeItem('attendanceCode');
-      }
+    const parsedCode = loadAttendanceCode();
+    if (parsedCode && Date.now() < parsedCode.expiresAt) {
+      setAttendanceCode(parsedCode);
+    } else if (parsedCode) {
+      removeAttendanceCode();
     }
 
     // Set timer for countdown
@@ -101,7 +63,7 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
         } else {
           setTimeLeft(null);
           setAttendanceCode(null);
-          localStorage.removeItem('attendanceCode');
+          removeAttendanceCode();
           clearInterval(timer);
         }
       }, 1000);
@@ -116,16 +78,14 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
       return;
     }
 
-    const code = Math.random().toString(36).substring(2, 8).toUpperCase();
-    const expiresAt = Date.now() + 5 * 60 * 1000; // 5 minutes
-    const newCode = { 
-      code, 
-      expiresAt,
-      date: format(sessionDate, 'yyyy-MM-dd'),
-      sessionName: sessionName || undefined
-    };
+    const newCode = generateNewAttendanceCode(sessionDate, sessionName);
+    if (!newCode) {
+      toast.error('Failed to generate attendance code');
+      return;
+    }
+    
     setAttendanceCode(newCode);
-    localStorage.setItem('attendanceCode', JSON.stringify(newCode));
+    saveAttendanceCode(newCode);
     toast.success('Attendance code generated! Valid for 5 minutes');
   };
 
@@ -163,7 +123,7 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
     };
 
     const updatedAttendances = [...attendances, newAttendance];
-    localStorage.setItem('attendances', JSON.stringify(updatedAttendances));
+    saveAttendances(updatedAttendances);
     setAttendances(updatedAttendances);
     setSubmittedCode('');
     toast.success('Attendance submitted successfully!');
@@ -173,7 +133,7 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
     if (!isInstructor) return;
     
     const updatedAttendances = attendances.filter(a => a.id !== id);
-    localStorage.setItem('attendances', JSON.stringify(updatedAttendances));
+    saveAttendances(updatedAttendances);
     setAttendances(updatedAttendances);
     toast.success('Attendance record deleted!');
   };
@@ -184,7 +144,7 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
     if (present) {
       // If marking present, find the attendance and remove it
       const updatedAttendances = attendances.filter(a => a.id !== id);
-      localStorage.setItem('attendances', JSON.stringify(updatedAttendances));
+      saveAttendances(updatedAttendances);
       setAttendances(updatedAttendances);
     } else {
       // If marking absent, add a new attendance record
@@ -201,7 +161,7 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
       };
       
       const updatedAttendances = [...attendances, newAttendance];
-      localStorage.setItem('attendances', JSON.stringify(updatedAttendances));
+      saveAttendances(updatedAttendances);
       setAttendances(updatedAttendances);
     }
     toast.success('Attendance record updated!');
@@ -220,42 +180,29 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
     };
     
     const updatedAttendances = [...attendances, newAttendance];
-    localStorage.setItem('attendances', JSON.stringify(updatedAttendances));
+    saveAttendances(updatedAttendances);
     setAttendances(updatedAttendances);
     toast.success('Manual attendance recorded!');
   };
 
-  const getAllStudentEmails = () => {
-    // Get all emails from users who are students
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    return users
-      .filter((user: any) => user.role === 'student')
-      .map((user: any) => user.email);
-  };
-
   // Helper function to find an attendance ID for a specific record
-  const getAttendanceId = (email: string, date: string, sessionName?: string): string => {
-    const attendance = attendances.find(
-      a => a.studentEmail === email && 
-      a.date === date && 
-      ((!sessionName && !a.sessionName) || a.sessionName === sessionName)
-    );
-    return attendance?.id || '';
+  const getAttendanceIdHelper = (email: string, date: string, sessionName?: string): string => {
+    return getAttendanceId(email, date, sessionName, attendances);
   };
 
-  const getStudentStats = (email: string): StudentStats => {
+  const getStudentStats = (email: string) => {
     return getStudentAttendanceStats(email, attendances);
   };
 
-  const getDaysWithSessionsData = (): Date[] => {
+  const getDaysWithSessionsData = () => {
     return getDaysWithSessions(attendances);
   };
 
-  const getSessionsForDateData = (date: Date): string[] => {
+  const getSessionsForDateData = (date: Date) => {
     return getSessionsForDate(date, attendances);
   };
 
-  const isDateInMonthCheck = (date: Date, month: Date): boolean => {
+  const isDateInMonthCheck = (date: Date, month: Date) => {
     return isDateInMonth(date, month);
   };
 
@@ -279,7 +226,7 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
     handleEditAttendance,
     handleDeleteAttendance,
     getStudentStats,
-    getAttendanceId,
+    getAttendanceId: getAttendanceIdHelper,
     getAllStudentEmails,
     getDaysWithSessionsData,
     getSessionsForDateData,

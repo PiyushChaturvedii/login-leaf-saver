@@ -12,7 +12,7 @@ import { AttendanceCodeGenerator } from './AttendanceCodeGenerator';
 import { AttendanceStats } from './AttendanceStats';
 import { InstructorCalendarView } from './InstructorCalendarView';
 import { StudentsListView } from './StudentsListView';
-import { useAttendance } from './context/AttendanceContext';
+import { useAttendance } from './context/useAttendance';
 import { Progress } from "@/components/ui/progress";
 
 export const InstructorDisplay = () => {

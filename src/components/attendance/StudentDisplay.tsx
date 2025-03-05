@@ -11,7 +11,7 @@ import { StudentSubmissionForm } from './StudentSubmissionForm';
 import { AttendanceStats } from './AttendanceStats';
 import { StudentCalendarView } from './StudentCalendarView';
 import { StudentListView } from './StudentListView';
-import { useAttendance } from './context/AttendanceContext';
+import { useAttendance } from './context/useAttendance';
 
 export const StudentDisplay = () => {
   const { 
@@ -22,7 +22,7 @@ export const StudentDisplay = () => {
   } = useAttendance();
   
   const [selectedMonth, setSelectedMonth] = useState<Date>(new Date());
-  const [selectedTab, setSelectedTab] = useState("attendance");
+  const [selectedTab, setSelectedTab] = useState("calendar");
   const stats = getStudentStats('currentUser');
   
   return (
