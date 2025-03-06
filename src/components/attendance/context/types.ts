@@ -18,8 +18,8 @@ export interface AttendanceContextType {
   // Actions
   generateAttendanceCode: () => void;
   submitAttendance: (e: React.FormEvent) => void;
-  handleManualAttendance: (studentEmail: string, date: string, sessionName?: string) => void;
-  handleEditAttendance: (id: string, studentEmail: string, present: boolean) => void;
+  handleManualAttendance: (studentEmail: string, date: string, sessionName?: string, status?: "present" | "absent" | "leave") => void;
+  handleEditAttendance: (id: string, studentEmail: string, status: "present" | "absent" | "leave") => void;
   handleDeleteAttendance: (id: string) => void;
   
   // Helpers

@@ -6,12 +6,14 @@ import { ArrowLeft, Edit, Trash, Users } from "lucide-react";
 import { Link } from 'react-router-dom';
 import { toast } from "sonner";
 import { Input } from './ui/input';
+import { PasswordChange } from './admin/PasswordChange';
+import { AccountingRole } from './admin/AccountingRole';
 
 // Define the user type
 interface User {
   email: string;
   name: string;
-  role: 'admin' | 'instructor' | 'student';
+  role: 'admin' | 'instructor' | 'student' | 'accounting';
   password?: string;
   fees?: any;
 }
@@ -20,12 +22,20 @@ export const SystemReport = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [editingUser, setEditingUser] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
-  const [editRole, setEditRole] = useState<'admin' | 'instructor' | 'student'>('student');
+  const [editRole, setEditRole] = useState<'admin' | 'instructor' | 'student' | 'accounting'>('student');
+  const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
   
   useEffect(() => {
     // Load users from localStorage
     const storedUsers = JSON.parse(localStorage.getItem('users') || '[]');
     setUsers(storedUsers);
+    
+    // Load current user session
+    const sessionData = localStorage.getItem('currentUser');
+    if (sessionData) {
+      const session = JSON.parse(sessionData);
+      setCurrentUserEmail(session.email);
+    }
   }, []);
 
   const handleEditUser = (user: User) => {
@@ -102,12 +112,13 @@ export const SystemReport = () => {
                     <div className="col-span-3">
                       <select 
                         value={editRole}
-                        onChange={(e) => setEditRole(e.target.value as 'admin' | 'instructor' | 'student')}
+                        onChange={(e) => setEditRole(e.target.value as 'admin' | 'instructor' | 'student' | 'accounting')}
                         className="w-full p-2 border rounded"
                       >
                         <option value="admin">Admin</option>
                         <option value="instructor">Instructor</option>
                         <option value="student">Student</option>
+                        <option value="accounting">Accounting</option>
                       </select>
                     </div>
                     <div className="col-span-2 flex justify-end space-x-1">
@@ -148,6 +159,18 @@ export const SystemReport = () => {
           </div>
         </CardContent>
       </Card>
+      
+      {/* Show password change component for admin */}
+      {currentUserEmail && users.find(u => u.email === currentUserEmail)?.role === 'admin' && (
+        <PasswordChange email={currentUserEmail} />
+      )}
+      
+      {/* Show accounting role component for admin or accounting role */}
+      {currentUserEmail && 
+        (users.find(u => u.email === currentUserEmail)?.role === 'admin' ||
+         users.find(u => u.email === currentUserEmail)?.role === 'accounting') && (
+        <AccountingRole />
+      )}
     </div>
   );
 };

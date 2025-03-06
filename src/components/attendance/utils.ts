@@ -21,16 +21,20 @@ export const getAttendanceRecords = (email: string, attendances: Attendance[]): 
       ? sessionKey.split('-')
       : [sessionKey, undefined];
     
-    const present = attendances.some(
+    const studentAttendance = attendances.find(
       a => a.studentEmail === email && 
       a.date === date && 
       (sessionName === undefined || a.sessionName === sessionName)
     );
     
+    const present = !!studentAttendance && (!studentAttendance.status || studentAttendance.status === "present");
+    const leave = !!studentAttendance && studentAttendance.status === "leave";
+    
     return {
       date,
       sessionName,
-      present
+      present,
+      leave
     };
   }).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 };
@@ -40,11 +44,17 @@ export const getStudentAttendanceStats = (email: string, attendances: Attendance
   const records = getAttendanceRecords(email, attendances);
   const totalSessions = records.length;
   const attended = records.filter(r => r.present).length;
-  const percentage = totalSessions > 0 ? Math.round((attended / totalSessions) * 100) : 0;
+  const leaves = records.filter(r => r.leave).length;
+  
+  // Calculate percentage based on attended sessions (leaves don't count as present but also don't count against attendance)
+  const percentage = totalSessions > 0 
+    ? Math.round((attended / (totalSessions - leaves)) * 100) 
+    : 0;
   
   return { 
     totalSessions, 
-    attended, 
+    attended,
+    leaves,
     percentage,
     records
   };

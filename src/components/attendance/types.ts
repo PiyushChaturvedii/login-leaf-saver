@@ -11,6 +11,7 @@ export interface Attendance {
   submittedAt: string;
   date: string;
   sessionName?: string;
+  status?: "present" | "absent" | "leave";
 }
 
 export interface AttendanceCode {
@@ -23,12 +24,14 @@ export interface AttendanceCode {
 export interface AttendanceRecord {
   date: string;
   present: boolean;
+  leave?: boolean;
   sessionName?: string;
 }
 
 export interface StudentStats {
   totalSessions: number;
   attended: number;
+  leaves: number;
   percentage: number;
   records: AttendanceRecord[];
 }
