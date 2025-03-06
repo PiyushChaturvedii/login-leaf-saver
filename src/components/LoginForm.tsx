@@ -14,9 +14,11 @@ interface LoginFormProps {
 export const LoginForm = ({ onLogin }: LoginFormProps) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
     
     try {
       console.log("Attempting login with:", email, password);
@@ -34,6 +36,7 @@ export const LoginForm = ({ onLogin }: LoginFormProps) => {
         
         toast.success("Admin login successful!");
         onLogin(adminUser);
+        setLoading(false);
         return;
       }
       
@@ -51,6 +54,7 @@ export const LoginForm = ({ onLogin }: LoginFormProps) => {
         // Admin users can bypass the approval check
         if (!user.approved && user.role !== 'admin') {
           toast.error("Your account is pending admin approval!");
+          setLoading(false);
           return;
         }
 
@@ -70,12 +74,14 @@ export const LoginForm = ({ onLogin }: LoginFormProps) => {
         onLogin(userData);
       } else {
         console.log("No matching user found");
-        toast.error("Invalid credentials!");
+        toast.error("Invalid credentials! Please register if you don't have an account.");
       }
     } catch (error) {
       console.error("Login error:", error);
       toast.error("An error occurred!");
     }
+    
+    setLoading(false);
   };
 
   return (
@@ -107,9 +113,9 @@ export const LoginForm = ({ onLogin }: LoginFormProps) => {
                 required
               />
             </div>
-            <Button type="submit" className="w-full">
+            <Button type="submit" className="w-full" disabled={loading}>
               <LogIn className="w-4 h-4 mr-2" />
-              Sign In
+              {loading ? 'Signing In...' : 'Sign In'}
             </Button>
           </form>
         </CardContent>
