@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { StudentSubmissionForm } from './StudentSubmissionForm';
 import { StudentCalendarView } from './StudentCalendarView';
@@ -6,6 +5,7 @@ import { useAttendance } from './context/useAttendance';
 import { StudentAttendanceCard } from './StudentAttendanceCard';
 
 export const StudentDisplay = () => {
+  
   const { 
     attendanceCode, 
     submittedCode, 
