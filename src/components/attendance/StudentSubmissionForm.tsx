@@ -3,17 +3,19 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { AttendanceCode } from './types';
 
-interface StudentSubmissionFormProps {
+export interface StudentSubmissionFormProps {
+  attendanceCode?: AttendanceCode | null;
   submittedCode: string;
   setSubmittedCode: (code: string) => void;
-  submitAttendance: (e: React.FormEvent) => void;
+  onSubmit: (e: React.FormEvent) => void;
 }
 
 export const StudentSubmissionForm = ({
   submittedCode,
   setSubmittedCode,
-  submitAttendance
+  onSubmit
 }: StudentSubmissionFormProps) => {
   return (
     <div>
@@ -25,7 +27,7 @@ export const StudentSubmissionForm = ({
           </Button>
         </Link>
       </div>
-      <form onSubmit={submitAttendance} className="space-y-4">
+      <form onSubmit={onSubmit} className="space-y-4">
         <div className="relative transform transition-all duration-300 hover:scale-[1.02]">
           <Input
             placeholder="Enter Attendance Code"

@@ -1,4 +1,5 @@
 
+import { useState } from 'react';
 import { StudentSubmissionForm } from './StudentSubmissionForm';
 import { StudentCalendarView } from './StudentCalendarView';
 import { useAttendance } from './context/useAttendance';
@@ -13,6 +14,8 @@ export const StudentDisplay = () => {
     getStudentStats
   } = useAttendance();
   
+  const [selectedMonth, setSelectedMonth] = useState<Date>(new Date());
+  
   // We assume userEmail is available in the context
   const userEmail = localStorage.getItem('currentUser') 
     ? JSON.parse(localStorage.getItem('currentUser')!).email
@@ -25,13 +28,14 @@ export const StudentDisplay = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <StudentSubmissionForm 
-            attendanceCode={attendanceCode}
             submittedCode={submittedCode}
             setSubmittedCode={setSubmittedCode}
             onSubmit={submitAttendance}
           />
           <StudentCalendarView 
             stats={studentStats}
+            selectedMonth={selectedMonth}
+            setSelectedMonth={setSelectedMonth}
           />
         </div>
         <div>

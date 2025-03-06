@@ -3,20 +3,21 @@ import { useState } from 'react';
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { CheckCircle, XCircle } from 'lucide-react';
-import { AttendanceRecord } from './types';
+import { AttendanceRecord, StudentStats } from './types';
 
-interface StudentCalendarViewProps {
-  records: AttendanceRecord[];
-  selectedMonth: Date;
-  setSelectedMonth: (date: Date) => void;
+export interface StudentCalendarViewProps {
+  stats: StudentStats;
+  selectedMonth?: Date;
+  setSelectedMonth?: (date: Date) => void;
 }
 
 export const StudentCalendarView = ({ 
-  records,
-  selectedMonth,
-  setSelectedMonth
+  stats,
+  selectedMonth = new Date(),
+  setSelectedMonth = () => {}
 }: StudentCalendarViewProps) => {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const { records } = stats;
 
   const getPresentDates = () => {
     return records
