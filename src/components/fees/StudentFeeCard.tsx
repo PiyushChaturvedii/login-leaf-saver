@@ -14,6 +14,7 @@ import { FeesRegistrationForm } from './FeesRegistrationForm';
 import { FeesOverview } from './FeesOverview';
 import { PaymentProgress } from './PaymentProgress';
 import { PaymentHistory } from './PaymentHistory';
+import { StudentInvoices } from './StudentInvoices';
 import { UserData } from './FeesTypes';
 
 interface StudentFeeCardProps {
@@ -107,6 +108,7 @@ export const StudentFeeCard = ({ student }: StudentFeeCardProps) => {
             <FeesOverview fees={student.fees} />
             <PaymentProgress studentEmail={student.email} fees={student.fees} />
             <PaymentHistory payments={student.fees.payments} />
+            <StudentInvoices studentEmail={student.email} />
           </div>
         )}
       </CardContent>

@@ -54,7 +54,7 @@ function App() {
         <Route path="/course-materials" element={
           loggedInUser ? (
             <ProjectManagement 
-              userRole={loggedInUser.role as 'admin' | 'instructor' | 'student'}
+              userRole={loggedInUser.role as 'admin' | 'instructor' | 'student' | 'accounting'}
               userEmail={loggedInUser.email}
             />
           ) : <Navigate to="/login" />
@@ -66,12 +66,12 @@ function App() {
         )}
 
         {/* Routes for students and admin */}
-        {loggedInUser && (loggedInUser.role === "student" || loggedInUser.role === "admin") && (
+        {loggedInUser && (loggedInUser.role === "student" || loggedInUser.role === "admin" || loggedInUser.role === "accounting") && (
           <Route path="/fees" element={<AdminFees />} />
         )}
 
-        {/* Routes for admin only */}
-        {loggedInUser && loggedInUser.role === "admin" && (
+        {/* Routes for admin and accounting */}
+        {loggedInUser && (loggedInUser.role === "admin" || loggedInUser.role === "accounting") && (
           <Route path="/user-management" element={<SystemReport />} />
         )}
       </Routes>

@@ -9,7 +9,7 @@ export interface UserData {
   /** User's full name */
   name: string;
   /** User's role in the system */
-  role: 'admin' | 'instructor' | 'student';
+  role: 'admin' | 'instructor' | 'student' | 'accounting';
   /** User's fees information (optional) */
   fees?: {
     /** Base fee amount without GST */

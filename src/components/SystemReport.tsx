@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { Input } from './ui/input';
 import { PasswordChange } from './admin/PasswordChange';
 import { AccountingRole } from './admin/AccountingRole';
+import { InvoiceManagement } from './admin/InvoiceManagement';
 
 // Define the user type
 interface User {
@@ -24,6 +25,7 @@ export const SystemReport = () => {
   const [editName, setEditName] = useState('');
   const [editRole, setEditRole] = useState<'admin' | 'instructor' | 'student' | 'accounting'>('student');
   const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
+  const [currentUserRole, setCurrentUserRole] = useState<string | null>(null);
   
   useEffect(() => {
     // Load users from localStorage
@@ -35,6 +37,7 @@ export const SystemReport = () => {
     if (sessionData) {
       const session = JSON.parse(sessionData);
       setCurrentUserEmail(session.email);
+      setCurrentUserRole(session.role);
     }
   }, []);
 
@@ -161,15 +164,17 @@ export const SystemReport = () => {
       </Card>
       
       {/* Show password change component for admin */}
-      {currentUserEmail && users.find(u => u.email === currentUserEmail)?.role === 'admin' && (
+      {currentUserEmail && currentUserRole === 'admin' && (
         <PasswordChange email={currentUserEmail} />
       )}
       
       {/* Show accounting role component for admin or accounting role */}
       {currentUserEmail && 
-        (users.find(u => u.email === currentUserEmail)?.role === 'admin' ||
-         users.find(u => u.email === currentUserEmail)?.role === 'accounting') && (
-        <AccountingRole />
+        (currentUserRole === 'admin' || currentUserRole === 'accounting') && (
+        <>
+          <AccountingRole />
+          <InvoiceManagement />
+        </>
       )}
     </div>
   );

@@ -62,7 +62,9 @@ export const PasswordChange = ({ email }: PasswordChangeProps) => {
       }
 
       // Update password
+      console.log("Before update:", allUsers[userIndex]);
       allUsers[userIndex].password = newPassword;
+      console.log("After update:", allUsers[userIndex]);
       localStorage.setItem('users', JSON.stringify(allUsers));
 
       // Show success message
