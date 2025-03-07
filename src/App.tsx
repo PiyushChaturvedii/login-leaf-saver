@@ -54,7 +54,7 @@ function App() {
         <Route path="/course-materials" element={
           loggedInUser ? (
             <ProjectManagement 
-              userRole={loggedInUser.role as 'admin' | 'instructor' | 'student' | 'accounting'}
+              userRole={loggedInUser.role === "accounting" ? "admin" : loggedInUser.role}
               userEmail={loggedInUser.email}
             />
           ) : <Navigate to="/login" />
