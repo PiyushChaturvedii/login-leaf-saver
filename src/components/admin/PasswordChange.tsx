@@ -4,8 +4,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
-import { Lock, UserCog } from "lucide-react";
+import { UserCog } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Label } from "@/components/ui/label";
 
 interface PasswordChangeProps {
   email: string;
@@ -64,14 +65,17 @@ export const PasswordChange = ({ email }: PasswordChangeProps) => {
       allUsers[userIndex].password = newPassword;
       localStorage.setItem('users', JSON.stringify(allUsers));
 
-      toast.success("Password updated successfully!");
+      // Show success message
+      toast.success(`Password for ${allUsers[userIndex].name} updated successfully!`);
       
       // Reset form
       setNewPassword('');
       setConfirmPassword('');
+      setSelectedUser('');
+      
     } catch (error) {
       console.error("Password change error:", error);
-      toast.error("Failed to update password!");
+      toast.error("Failed to update password! Please try again.");
     }
 
     setLoading(false);
@@ -88,12 +92,12 @@ export const PasswordChange = ({ email }: PasswordChangeProps) => {
       <CardContent>
         <form onSubmit={handlePasswordChange} className="space-y-4">
           <div className="space-y-2">
-            <label className="text-sm font-medium">Select User</label>
+            <Label htmlFor="user-select">Select User</Label>
             <Select 
               value={selectedUser} 
               onValueChange={setSelectedUser}
             >
-              <SelectTrigger className="w-full">
+              <SelectTrigger id="user-select" className="w-full">
                 <SelectValue placeholder="Select a user" />
               </SelectTrigger>
               <SelectContent>
@@ -107,22 +111,26 @@ export const PasswordChange = ({ email }: PasswordChangeProps) => {
           </div>
           
           <div className="space-y-2">
-            <label className="text-sm font-medium">New Password</label>
+            <Label htmlFor="new-password">New Password</Label>
             <Input
+              id="new-password"
               type="password"
               value={newPassword}
               onChange={e => setNewPassword(e.target.value)}
               required
+              placeholder="Enter new password"
             />
           </div>
           
           <div className="space-y-2">
-            <label className="text-sm font-medium">Confirm New Password</label>
+            <Label htmlFor="confirm-password">Confirm New Password</Label>
             <Input
+              id="confirm-password"
               type="password"
               value={confirmPassword}
               onChange={e => setConfirmPassword(e.target.value)}
               required
+              placeholder="Confirm new password"
             />
           </div>
           
