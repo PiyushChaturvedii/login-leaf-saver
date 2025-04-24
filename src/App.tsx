@@ -11,6 +11,7 @@ import { AdminFees } from './components/AdminFees';
 import { SystemReport } from './components/SystemReport';
 import { ProjectManagement } from './components/ProjectManagement';
 import { Toaster } from "@/components/ui/sonner";
+import { Dashboard as DashboardComponent } from './components/Dashboard'; // Fixed import for the Dashboard component
 
 function App() {
   const [loggedInUser, setLoggedInUser] = useState(() => {
@@ -40,7 +41,7 @@ function App() {
       <Toaster position="top-right" />
       <Routes>
         <Route path="/" element={loggedInUser ? <Navigate to="/user-dashboard" /> : <Index />} />
-        <Route path="/dashboard" element={loggedInUser ? <Dashboard onLogout={handleLogout} user={loggedInUser} /> : <Navigate to="/" />} />
+        <Route path="/dashboard" element={loggedInUser ? <DashboardComponent onLogout={handleLogout} user={loggedInUser} /> : <Navigate to="/" />} />
         <Route path="/profile-setup" element={loggedInUser ? <ProfileSetup /> : <Navigate to="/" />} />
         <Route path="/user-dashboard" element={loggedInUser ? <UserDashboard /> : <Navigate to="/" />} />
 
