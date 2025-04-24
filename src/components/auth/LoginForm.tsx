@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LogIn, Lock } from 'lucide-react';
+import { LogIn } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -33,7 +33,7 @@ export const LoginForm = ({ onToggleForm, onShowResetForm }: LoginFormProps) => 
           role: 'admin',
         }));
         
-        toast.success("Admin login successful!");
+        toast.success("एडमिन लॉगिन सफल!");
         navigate('/dashboard');
         return;
       }
@@ -51,7 +51,7 @@ export const LoginForm = ({ onToggleForm, onShowResetForm }: LoginFormProps) => 
       if (user) {
         // Admin users can bypass the approval check
         if (!user.approved && user.role !== 'admin') {
-          toast.error("Your account is pending admin approval!");
+          toast.error("आपका अकाउंट एडमिन अप्रूवल के लिए पेंडिंग है!");
           return;
         }
 
@@ -66,14 +66,14 @@ export const LoginForm = ({ onToggleForm, onShowResetForm }: LoginFormProps) => 
           course: user.course,
           photo: user.photo,
         }));
-        toast.success("Login successful!");
+        toast.success("लॉगिन सफल!");
         navigate('/dashboard');
       } else {
-        toast.error("Invalid credentials!");
+        toast.error("अमान्य क्रेडेंशियल्स!");
       }
     } catch (error) {
       console.error("Login error:", error);
-      toast.error("An error occurred!");
+      toast.error("एक त्रुटि हुई!");
     }
   };
 
@@ -81,21 +81,21 @@ export const LoginForm = ({ onToggleForm, onShowResetForm }: LoginFormProps) => 
     <form onSubmit={handleLogin} className="space-y-4">
       <Input
         type="email"
-        placeholder="Email"
+        placeholder="ईमेल"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         required
       />
       <Input
         type="password"
-        placeholder="Password"
+        placeholder="पासवर्ड"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         required
       />
       <Button type="submit" className="w-full">
         <LogIn className="w-4 h-4 mr-2" />
-        Sign In
+        साइन इन
       </Button>
 
       <div className="mt-6 text-center space-y-2">
@@ -104,14 +104,14 @@ export const LoginForm = ({ onToggleForm, onShowResetForm }: LoginFormProps) => 
           className="text-sm text-blue-600 hover:underline block w-full"
           type="button"
         >
-          Forgot Password?
+          पासवर्ड भूल गए?
         </button>
         <button
           onClick={onToggleForm}
           className="text-sm text-gray-600 hover:text-gray-900 transition-colors duration-200"
           type="button"
         >
-          Don't have an account? Sign up
+          अकाउंट नहीं है? साइन अप करें
         </button>
       </div>
     </form>

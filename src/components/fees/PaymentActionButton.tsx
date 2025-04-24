@@ -18,7 +18,7 @@ export const PaymentActionButton = ({ onClick }: PaymentActionButtonProps) => {
       className="w-full mt-4 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 transform hover:-translate-y-1 transition-all duration-200 shadow hover:shadow-md"
     >
       <PlusCircle className="w-4 h-4 mr-2" />
-      Record EMI Payment
+      EMI भुगतान दर्ज करें
     </Button>
   );
 };

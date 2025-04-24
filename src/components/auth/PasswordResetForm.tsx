@@ -17,14 +17,14 @@ export const PasswordResetForm = ({ onBack }: PasswordResetFormProps) => {
     const userIndex = users.findIndex((u: any) => u.email === resetEmail);
     
     if (userIndex === -1) {
-      toast.error("User not found!");
+      toast.error("यूजर नहीं मिला!");
       return;
     }
 
     const newPassword = Math.random().toString(36).slice(-8);
     users[userIndex].password = newPassword;
     localStorage.setItem('users', JSON.stringify(users));
-    toast.success(`Password reset successful! New password: ${newPassword}`);
+    toast.success(`पासवर्ड रीसेट सफल! नया पासवर्ड: ${newPassword}`);
     onBack();
     setResetEmail('');
   };
@@ -33,19 +33,19 @@ export const PasswordResetForm = ({ onBack }: PasswordResetFormProps) => {
     <form onSubmit={handlePasswordReset} className="space-y-4">
       <Input
         type="email"
-        placeholder="Email"
+        placeholder="ईमेल"
         value={resetEmail}
         onChange={(e) => setResetEmail(e.target.value)}
         required
       />
-      <Button type="submit" className="w-full">Reset Password</Button>
+      <Button type="submit" className="w-full">पासवर्ड रीसेट करें</Button>
       <Button 
         type="button" 
         variant="ghost" 
         className="w-full"
         onClick={onBack}
       >
-        Back to Login
+        लॉगिन पेज पर वापस जाएँ
       </Button>
     </form>
   );

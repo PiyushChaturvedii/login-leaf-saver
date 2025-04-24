@@ -40,7 +40,7 @@ export const RegistrationForm = ({ onToggleForm }: RegistrationFormProps) => {
       const existingData = JSON.parse(localStorage.getItem('users') || '[]');
       
       if (existingData.some((user: UserData) => user.email === email)) {
-        toast.error("User already exists!");
+        toast.error("यूजर पहले से मौजूद है!");
         return;
       }
 
@@ -63,21 +63,21 @@ export const RegistrationForm = ({ onToggleForm }: RegistrationFormProps) => {
       };
 
       if (isFirstAdmin) {
-        toast.success("Default admin credentials set!");
+        toast.success("डिफ़ॉल्ट एडमिन क्रेडेंशियल्स सेट किए गए!");
       }
 
       existingData.push(userData);
       localStorage.setItem('users', JSON.stringify(existingData));
       
       if (role !== 'admin') {
-        toast.success("Registration successful! Waiting for admin approval.");
+        toast.success("पंजीकरण सफल! एडमिन अप्रूवल का इंतजार करें।");
       } else {
-        toast.success("Admin registration successful! You can login now.");
+        toast.success("एडमिन पंजीकरण सफल! आप अब लॉगिन कर सकते हैं।");
       }
       
       onToggleForm();
     } catch (error) {
-      toast.error("An error occurred!");
+      toast.error("एक त्रुटि हुई!");
     }
   };
 
@@ -85,7 +85,7 @@ export const RegistrationForm = ({ onToggleForm }: RegistrationFormProps) => {
     <form onSubmit={handleRegistration} className="space-y-4">
       <Input
         type="text"
-        placeholder="Full Name"
+        placeholder="पूरा नाम"
         value={name}
         onChange={(e) => setName(e.target.value)}
         required
@@ -99,7 +99,7 @@ export const RegistrationForm = ({ onToggleForm }: RegistrationFormProps) => {
           onClick={() => setRole('student')}
         >
           <School className="w-4 h-4 mr-2" />
-          Student
+          छात्र
         </Button>
         <Button
           type="button"
@@ -108,7 +108,7 @@ export const RegistrationForm = ({ onToggleForm }: RegistrationFormProps) => {
           onClick={() => setRole('instructor')}
         >
           <UserCog className="w-4 h-4 mr-2" />
-          Instructor
+          शिक्षक
         </Button>
         <Button
           type="button"
@@ -117,7 +117,7 @@ export const RegistrationForm = ({ onToggleForm }: RegistrationFormProps) => {
           onClick={() => setRole('admin')}
         >
           <UserCog className="w-4 h-4 mr-2" />
-          Admin
+          एडमिन
         </Button>
       </div>
 
@@ -125,35 +125,35 @@ export const RegistrationForm = ({ onToggleForm }: RegistrationFormProps) => {
         <>
           <Input
             type="text"
-            placeholder="GitHub Profile URL"
+            placeholder="GitHub प्रोफाइल URL"
             value={github}
             onChange={(e) => setGithub(e.target.value)}
             required
           />
           <Input
             type="text"
-            placeholder="LinkedIn Profile URL"
+            placeholder="LinkedIn प्रोफाइल URL"
             value={linkedin}
             onChange={(e) => setLinkedin(e.target.value)}
             required
           />
           <Input
             type="tel"
-            placeholder="WhatsApp Number"
+            placeholder="WhatsApp नंबर"
             value={whatsapp}
             onChange={(e) => setWhatsapp(e.target.value)}
             required
           />
           <Input
             type="text"
-            placeholder="College Name"
+            placeholder="कॉलेज का नाम"
             value={college}
             onChange={(e) => setCollege(e.target.value)}
             required
           />
           <Input
             type="text"
-            placeholder="Course/Branch"
+            placeholder="कोर्स/ब्रांच"
             value={course}
             onChange={(e) => setCourse(e.target.value)}
             required
@@ -163,21 +163,21 @@ export const RegistrationForm = ({ onToggleForm }: RegistrationFormProps) => {
 
       <Input
         type="email"
-        placeholder="Email"
+        placeholder="ईमेल"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         required
       />
       <Input
         type="password"
-        placeholder="Password"
+        placeholder="पासवर्ड"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         required
       />
       <Button type="submit" className="w-full">
         <UserPlus className="w-4 h-4 mr-2" />
-        Create Account
+        अकाउंट बनाएँ
       </Button>
 
       <button
@@ -185,7 +185,7 @@ export const RegistrationForm = ({ onToggleForm }: RegistrationFormProps) => {
         className="text-sm text-gray-600 hover:text-gray-900 transition-colors duration-200 w-full text-center"
         type="button"
       >
-        Already have an account? Sign in
+        पहले से अकाउंट है? साइन इन करें
       </button>
     </form>
   );

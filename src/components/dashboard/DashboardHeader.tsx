@@ -39,9 +39,9 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             <div className="flex items-center space-x-2">
               <Code className="w-8 h-8 text-indigo-600" />
               <span className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                {userData.role === 'admin' ? 'Admin Dashboard' : 
-                 userData.role === 'instructor' ? 'Instructor Dashboard' : 
-                 'Student Dashboard'}
+                {userData.role === 'admin' ? 'एडमिन डैशबोर्ड' : 
+                 userData.role === 'instructor' ? 'शिक्षक डैशबोर्ड' : 
+                 'छात्र डैशबोर्ड'}
               </span>
             </div>
           </div>
@@ -65,7 +65,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               className="flex items-center space-x-1"
             >
               <BookOpen className="w-4 h-4" />
-              <span>Projects</span>
+              <span>प्रोजेक्ट्स</span>
             </Button>
             
             {isAdmin && (
@@ -76,7 +76,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                   className="flex items-center space-x-1"
                 >
                   <Users className="w-4 h-4" />
-                  <span>Users</span>
+                  <span>यूजर्स</span>
                 </Button>
                 <Button 
                   variant={activeTab === 'fees' ? "default" : "ghost"}
@@ -84,7 +84,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                   className="flex items-center space-x-1"
                 >
                   <BarChart4 className="w-4 h-4" />
-                  <span>Fees</span>
+                  <span>फीस</span>
                 </Button>
                 <Button 
                   variant={activeTab === 'report' ? "default" : "ghost"}
@@ -92,7 +92,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                   className="flex items-center space-x-1"
                 >
                   <FileText className="w-4 h-4" />
-                  <span>Report</span>
+                  <span>रिपोर्ट</span>
                 </Button>
               </>
             )}
@@ -105,7 +105,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                   className="flex items-center space-x-1"
                 >
                   <Calendar className="w-4 h-4" />
-                  <span>Attendance</span>
+                  <span>अटेंडेंस</span>
                 </Button>
                 <Button 
                   variant={activeTab === 'report' ? "default" : "ghost"}
@@ -113,7 +113,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                   className="flex items-center space-x-1"
                 >
                   <FileText className="w-4 h-4" />
-                  <span>Report</span>
+                  <span>रिपोर्ट</span>
                 </Button>
               </>
             )}
@@ -126,7 +126,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                   className="flex items-center space-x-1"
                 >
                   <GraduationCap className="w-4 h-4" />
-                  <span>Profile</span>
+                  <span>प्रोफाइल</span>
                 </Button>
                 <Button 
                   variant={activeTab === 'attendance' ? "default" : "ghost"}
@@ -134,7 +134,7 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                   className="flex items-center space-x-1"
                 >
                   <CheckSquare className="w-4 h-4" />
-                  <span>Attendance</span>
+                  <span>अटेंडेंस</span>
                 </Button>
               </>
             )}
@@ -148,11 +148,11 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
                     className="flex items-center space-x-1 text-red-500 hover:text-red-700 hover:bg-red-50 ml-2"
                   >
                     <LogOut className="w-4 h-4" />
-                    <span className="hidden sm:inline">Logout</span>
+                    <span className="hidden sm:inline">लॉगआउट</span>
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Log out</p>
+                  <p>लॉगआउट</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>

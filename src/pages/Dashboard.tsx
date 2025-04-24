@@ -58,7 +58,7 @@ const Dashboard = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('currentUser');
-    toast.success("Logged out successfully");
+    toast.success("सफलतापूर्वक लॉगआउट हो गए");
     navigate('/');
   };
 
@@ -96,7 +96,7 @@ const Dashboard = () => {
           userName={userData.name}
           userRole={userData.role}
           message={userData.role === 'student' ? 
-            `Your next project is due soon. Don't forget to submit it before the deadline!` :
+            `आपका अगला प्रोजेक्ट जल्द ही देय है। समय सीमा से पहले इसे जमा करना न भूलें!` :
             undefined}
         />
 

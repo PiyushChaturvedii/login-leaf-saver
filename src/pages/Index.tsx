@@ -22,7 +22,7 @@ const Index = () => {
             )}
           </div>
           <h1 className="text-2xl font-semibold text-gray-800 mb-2">
-            {showResetForm ? 'Reset Password' : (isLogin ? 'Academy Login' : 'Registration')}
+            {showResetForm ? 'पासवर्ड रीसेट' : (isLogin ? 'अकादमी लॉगिन' : 'पंजीकरण')}
           </h1>
         </div>
 
