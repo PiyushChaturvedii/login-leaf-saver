@@ -1,6 +1,7 @@
-
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { LanguageProvider } from './context/LanguageContext';
+import { LanguageToggle } from './components/ui/LanguageToggle';
 import Index from './pages/Index';
 import Dashboard from './pages/Dashboard';
 import ProfileSetup from './pages/ProfileSetup';
@@ -11,7 +12,7 @@ import { AdminFees } from './components/AdminFees';
 import { SystemReport } from './components/SystemReport';
 import { ProjectManagement } from './components/ProjectManagement';
 import { Toaster } from "@/components/ui/sonner";
-import { Dashboard as DashboardComponent } from './components/Dashboard'; // Fixed import for the Dashboard component
+import { Dashboard as DashboardComponent } from './components/Dashboard';
 
 function App() {
   const [loggedInUser, setLoggedInUser] = useState(() => {
@@ -20,7 +21,6 @@ function App() {
   });
 
   useEffect(() => {
-    // Update local storage when loggedInUser changes
     if (loggedInUser) {
       localStorage.setItem('currentUser', JSON.stringify(loggedInUser));
     } else {
@@ -37,49 +37,52 @@ function App() {
   };
 
   return (
-    <Router>
-      <Toaster position="top-right" />
-      <Routes>
-        <Route path="/" element={loggedInUser ? <Navigate to="/user-dashboard" /> : <Index />} />
-        <Route path="/dashboard" element={loggedInUser ? <DashboardComponent onLogout={handleLogout} user={loggedInUser} /> : <Navigate to="/" />} />
-        <Route path="/profile-setup" element={loggedInUser ? <ProfileSetup /> : <Navigate to="/" />} />
-        <Route path="/user-dashboard" element={loggedInUser ? <UserDashboard /> : <Navigate to="/" />} />
+    <LanguageProvider>
+      <Router>
+        <div className="relative">
+          <div className="absolute top-4 right-4 z-50">
+            <LanguageToggle />
+          </div>
+          <Toaster position="top-right" />
+          <Routes>
+            <Route path="/" element={loggedInUser ? <Navigate to="/user-dashboard" /> : <Index />} />
+            <Route path="/dashboard" element={loggedInUser ? <DashboardComponent onLogout={handleLogout} user={loggedInUser} /> : <Navigate to="/" />} />
+            <Route path="/profile-setup" element={loggedInUser ? <ProfileSetup /> : <Navigate to="/" />} />
+            <Route path="/user-dashboard" element={loggedInUser ? <UserDashboard /> : <Navigate to="/" />} />
 
-        {/* Routes for all authenticated users */}
-        <Route path="/attendance" element={
-          loggedInUser ? (
-            <AttendanceSystem 
-              isInstructor={loggedInUser.role === "instructor" || loggedInUser.role === "admin"} 
-              userEmail={loggedInUser.email} 
-            />
-          ) : <Navigate to="/" />
-        } />
+            <Route path="/attendance" element={
+              loggedInUser ? (
+                <AttendanceSystem 
+                  isInstructor={loggedInUser.role === "instructor" || loggedInUser.role === "admin"} 
+                  userEmail={loggedInUser.email} 
+                />
+              ) : <Navigate to="/" />
+            } />
 
-        <Route path="/course-materials" element={
-          loggedInUser ? (
-            <ProjectManagement 
-              userRole={loggedInUser.role === "accounting" ? "admin" : loggedInUser.role}
-              userEmail={loggedInUser.email}
-            />
-          ) : <Navigate to="/" />
-        } />
+            <Route path="/course-materials" element={
+              loggedInUser ? (
+                <ProjectManagement 
+                  userRole={loggedInUser.role === "accounting" ? "admin" : loggedInUser.role}
+                  userEmail={loggedInUser.email}
+                />
+              ) : <Navigate to="/" />
+            } />
 
-        {/* Routes for students */}
-        {loggedInUser && loggedInUser.role === "student" && (
-          <Route path="/student-profile" element={<StudentProfile userData={loggedInUser} />} />
-        )}
+            {loggedInUser && loggedInUser.role === "student" && (
+              <Route path="/student-profile" element={<StudentProfile userData={loggedInUser} />} />
+            )}
 
-        {/* Routes for students and admin */}
-        {loggedInUser && (loggedInUser.role === "student" || loggedInUser.role === "admin" || loggedInUser.role === "accounting") && (
-          <Route path="/fees" element={<AdminFees />} />
-        )}
+            {loggedInUser && (loggedInUser.role === "student" || loggedInUser.role === "admin" || loggedInUser.role === "accounting") && (
+              <Route path="/fees" element={<AdminFees />} />
+            )}
 
-        {/* Routes for admin and accounting */}
-        {loggedInUser && (loggedInUser.role === "admin" || loggedInUser.role === "accounting") && (
-          <Route path="/user-management" element={<SystemReport />} />
-        )}
-      </Routes>
-    </Router>
+            {loggedInUser && (loggedInUser.role === "admin" || loggedInUser.role === "accounting") && (
+              <Route path="/user-management" element={<SystemReport />} />
+            )}
+          </Routes>
+        </div>
+      </Router>
+    </LanguageProvider>
   );
 }
 
