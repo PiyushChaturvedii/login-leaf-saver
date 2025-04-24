@@ -18,6 +18,8 @@ interface PaymentProgressProps {
 
 export const PaymentProgress = ({ studentEmail, fees }: PaymentProgressProps) => {
   return (
-    <PaymentProgressContainer studentEmail={studentEmail} fees={fees} />
+    <div className="animate-fade-in">
+      <PaymentProgressContainer studentEmail={studentEmail} fees={fees} />
+    </div>
   );
 };

@@ -20,13 +20,16 @@ import {
   getAttendanceId,
   saveAttendances,
   loadAttendances,
+  loadAttendanceCode,
+  removeAttendanceCode,
+  saveAttendanceCode,
+  generateNewAttendanceCode
 } from './attendanceUtils';
-import { 
+import {
   loadAndValidateAttendanceCode,
   setupCodeTimer
 } from './attendanceCodeUtils';
 import {
-  generateCode,
   submitAttendance,
   manageAttendanceRecords
 } from './attendanceActions';
@@ -53,7 +56,20 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
   }, [attendanceCode]);
 
   const generateAttendanceCode = () => {
-    generateCode(sessionDate, sessionName, setAttendanceCode);
+    if (!sessionDate) {
+      console.error("Cannot generate code: Session date is undefined");
+      return;
+    }
+
+    const newCode = generateNewAttendanceCode(sessionDate, sessionName);
+    if (!newCode) {
+      console.error("Failed to generate attendance code");
+      return;
+    }
+    
+    setAttendanceCode(newCode);
+    saveAttendanceCode(newCode);
+    console.log("Generated attendance code:", newCode);
   };
 
   const handleSubmitAttendance = (e: React.FormEvent) => {

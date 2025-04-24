@@ -25,6 +25,7 @@ export const PasswordChange = ({ email }: PasswordChangeProps) => {
     // Filter out the admin user from the list
     const filteredUsers = storedUsers.filter((u: any) => u.email !== email);
     setUsers(filteredUsers);
+    console.log("Loaded users:", filteredUsers);
   }, [email]);
 
   const handlePasswordChange = (e: React.FormEvent) => {
@@ -78,9 +79,9 @@ export const PasswordChange = ({ email }: PasswordChangeProps) => {
     } catch (error) {
       console.error("Password change error:", error);
       toast.error("Failed to update password! Please try again.");
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (
@@ -121,6 +122,7 @@ export const PasswordChange = ({ email }: PasswordChangeProps) => {
               onChange={e => setNewPassword(e.target.value)}
               required
               placeholder="Enter new password"
+              className="border-gray-300"
             />
           </div>
           
@@ -133,12 +135,13 @@ export const PasswordChange = ({ email }: PasswordChangeProps) => {
               onChange={e => setConfirmPassword(e.target.value)}
               required
               placeholder="Confirm new password"
+              className="border-gray-300"
             />
           </div>
           
           <Button 
             type="submit" 
-            className="w-full" 
+            className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 transition-all" 
             disabled={loading || !selectedUser || !newPassword || !confirmPassword}
           >
             {loading ? "Updating..." : "Update User Password"}
