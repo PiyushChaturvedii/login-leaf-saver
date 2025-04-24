@@ -1,14 +1,16 @@
 
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-import { Dashboard } from './components/Dashboard';
-import { LoginForm } from './components/LoginForm';
-import { RegisterForm } from './components/RegisterForm';
+import Index from './pages/Index';
+import Dashboard from './pages/Dashboard';
+import ProfileSetup from './pages/ProfileSetup';
+import UserDashboard from './pages/dashboard/UserDashboard';
 import { AttendanceSystem } from './components/AttendanceSystem';
 import { StudentProfile } from './components/StudentProfile';
 import { AdminFees } from './components/AdminFees';
 import { SystemReport } from './components/SystemReport';
 import { ProjectManagement } from './components/ProjectManagement';
+import { Toaster } from "@/components/ui/sonner";
 
 function App() {
   const [loggedInUser, setLoggedInUser] = useState(() => {
@@ -35,11 +37,12 @@ function App() {
 
   return (
     <Router>
+      <Toaster position="top-right" />
       <Routes>
-        <Route path="/login" element={loggedInUser ? <Navigate to="/dashboard" /> : <LoginForm onLogin={handleLogin} />} />
-        <Route path="/register" element={loggedInUser ? <Navigate to="/dashboard" /> : <RegisterForm onRegister={handleLogin} />} />
-        <Route path="/dashboard" element={loggedInUser ? <Dashboard onLogout={handleLogout} user={loggedInUser} /> : <Navigate to="/login" />} />
-        <Route path="/" element={<Navigate to="/dashboard" />} />
+        <Route path="/" element={loggedInUser ? <Navigate to="/user-dashboard" /> : <Index />} />
+        <Route path="/dashboard" element={loggedInUser ? <Dashboard onLogout={handleLogout} user={loggedInUser} /> : <Navigate to="/" />} />
+        <Route path="/profile-setup" element={loggedInUser ? <ProfileSetup /> : <Navigate to="/" />} />
+        <Route path="/user-dashboard" element={loggedInUser ? <UserDashboard /> : <Navigate to="/" />} />
 
         {/* Routes for all authenticated users */}
         <Route path="/attendance" element={
@@ -48,7 +51,7 @@ function App() {
               isInstructor={loggedInUser.role === "instructor" || loggedInUser.role === "admin"} 
               userEmail={loggedInUser.email} 
             />
-          ) : <Navigate to="/login" />
+          ) : <Navigate to="/" />
         } />
 
         <Route path="/course-materials" element={
@@ -57,7 +60,7 @@ function App() {
               userRole={loggedInUser.role === "accounting" ? "admin" : loggedInUser.role}
               userEmail={loggedInUser.email}
             />
-          ) : <Navigate to="/login" />
+          ) : <Navigate to="/" />
         } />
 
         {/* Routes for students */}
