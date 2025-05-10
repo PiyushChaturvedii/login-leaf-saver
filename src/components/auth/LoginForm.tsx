@@ -13,7 +13,7 @@ interface LoginFormProps {
 
 export const LoginForm = ({ onToggleForm, onShowResetForm }: LoginFormProps) => {
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
+  const [emailOrUsername, setEmailOrUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -22,10 +22,10 @@ export const LoginForm = ({ onToggleForm, onShowResetForm }: LoginFormProps) => 
     setIsLoading(true);
     
     try {
-      console.log("Attempting login with:", email, password);
+      console.log("Attempting login with:", emailOrUsername, password);
       
       // Check if this is the admin
-      if (email === 'admin@academy.com' && password === 'admin123') {
+      if (emailOrUsername === 'admin@academy.com' && password === 'admin123') {
         console.log("Admin login detected");
         
         // Set admin user details in localStorage
@@ -45,8 +45,9 @@ export const LoginForm = ({ onToggleForm, onShowResetForm }: LoginFormProps) => 
       const users = JSON.parse(localStorage.getItem('users') || '[]');
       console.log("Retrieved users:", users);
       
+      // Check if user exists by email OR username
       const user = users.find((u: any) => 
-        u.email === email && u.password === password
+        (u.email === emailOrUsername || u.name === emailOrUsername) && u.password === password
       );
       
       console.log("Found user:", user);
@@ -87,10 +88,10 @@ export const LoginForm = ({ onToggleForm, onShowResetForm }: LoginFormProps) => 
   return (
     <form onSubmit={handleLogin} className="space-y-4">
       <Input
-        type="email"
-        placeholder="ईमेल"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
+        type="text"
+        placeholder="ईमेल या यूजरनेम"
+        value={emailOrUsername}
+        onChange={(e) => setEmailOrUsername(e.target.value)}
         required
         disabled={isLoading}
       />
