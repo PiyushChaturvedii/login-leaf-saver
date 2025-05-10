@@ -3,6 +3,7 @@ import React from 'react';
 import { LogOut, Code, X, MenuIcon, BookOpen, Users, BarChart4, FileText, Calendar, GraduationCap, CheckSquare } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip";
+import { LanguageToggle } from "@/components/ui/LanguageToggle";
 
 // Define the type for dashboard tabs
 type DashboardTab = 'projects' | 'profile' | 'attendance' | 'students' | 'fees' | 'users' | 'report';
@@ -139,23 +140,28 @@ export const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               </>
             )}
             
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button 
-                    variant="outline" 
-                    onClick={handleLogout} 
-                    className="flex items-center space-x-1 text-red-500 hover:text-red-700 hover:bg-red-50 ml-2"
-                  >
-                    <LogOut className="w-4 h-4" />
-                    <span className="hidden sm:inline">लॉगआउट</span>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>लॉगआउट</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+            <div className="flex items-center space-x-2 ml-2">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      onClick={handleLogout} 
+                      className="flex items-center space-x-1 text-red-500 hover:text-red-700 hover:bg-red-50"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      <span className="hidden sm:inline">लॉगआउट</span>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>लॉगआउट</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              
+              {/* Language Toggle button placed below logout */}
+              <LanguageToggle />
+            </div>
           </div>
         </div>
       </div>

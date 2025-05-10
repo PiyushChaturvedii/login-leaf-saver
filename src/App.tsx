@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { LanguageProvider } from './context/LanguageContext';
-import { LanguageToggle } from './components/ui/LanguageToggle';
 import Index from './pages/Index';
 import Dashboard from './pages/Dashboard';
 import ProfileSetup from './pages/ProfileSetup';
@@ -41,9 +40,6 @@ function App() {
     <LanguageProvider>
       <Router>
         <div className="relative">
-          <div className="absolute top-4 right-4 z-50">
-            <LanguageToggle />
-          </div>
           <Toaster position="top-right" />
           <Routes>
             <Route path="/" element={loggedInUser ? <Navigate to="/user-dashboard" /> : <Index />} />

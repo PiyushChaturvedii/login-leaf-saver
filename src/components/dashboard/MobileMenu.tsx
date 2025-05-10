@@ -2,6 +2,7 @@
 import React from 'react';
 import { LogOut, BookOpen, Users, BarChart4, FileText, Calendar, GraduationCap, CheckSquare } from 'lucide-react';
 import { Button } from "@/components/ui/button";
+import { LanguageToggle } from "@/components/ui/LanguageToggle";
 
 // Define the type for dashboard tabs
 type DashboardTab = 'projects' | 'profile' | 'attendance' | 'students' | 'fees' | 'users' | 'report';
@@ -127,7 +128,7 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
               </>
             )}
             
-            <div className="pt-4 border-t mt-4">
+            <div className="pt-4 border-t mt-4 space-y-2">
               <Button 
                 variant="ghost" 
                 onClick={() => {
@@ -139,6 +140,11 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
                 <LogOut className="w-4 h-4 mr-2" />
                 <span>Logout</span>
               </Button>
+              
+              {/* Language Toggle in mobile menu */}
+              <div className="flex justify-center mt-2 pb-2">
+                <LanguageToggle />
+              </div>
             </div>
           </div>
         </div>
