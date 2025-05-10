@@ -15,9 +15,11 @@ export const LoginForm = ({ onToggleForm, onShowResetForm }: LoginFormProps) => 
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     
     try {
       console.log("Attempting login with:", email, password);
@@ -31,10 +33,11 @@ export const LoginForm = ({ onToggleForm, onShowResetForm }: LoginFormProps) => 
           email: 'admin@academy.com',
           name: 'Admin',
           role: 'admin',
+          profileCompleted: true
         }));
         
         toast.success("एडमिन लॉगिन सफल!");
-        navigate('/dashboard');
+        navigate('/user-dashboard');
         return;
       }
       
@@ -52,6 +55,7 @@ export const LoginForm = ({ onToggleForm, onShowResetForm }: LoginFormProps) => 
         // Admin users can bypass the approval check
         if (!user.approved && user.role !== 'admin') {
           toast.error("आपका अकाउंट एडमिन अप्रूवल के लिए पेंडिंग है!");
+          setIsLoading(false);
           return;
         }
 
@@ -65,15 +69,18 @@ export const LoginForm = ({ onToggleForm, onShowResetForm }: LoginFormProps) => 
           college: user.college,
           course: user.course,
           photo: user.photo,
+          profileCompleted: Boolean(user.github && user.linkedin && user.whatsapp && user.college && user.course)
         }));
         toast.success("लॉगिन सफल!");
-        navigate('/dashboard');
+        navigate('/user-dashboard');
       } else {
         toast.error("अमान्य क्रेडेंशियल्स!");
       }
     } catch (error) {
       console.error("Login error:", error);
       toast.error("एक त्रुटि हुई!");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -85,6 +92,7 @@ export const LoginForm = ({ onToggleForm, onShowResetForm }: LoginFormProps) => 
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         required
+        disabled={isLoading}
       />
       <Input
         type="password"
@@ -92,10 +100,11 @@ export const LoginForm = ({ onToggleForm, onShowResetForm }: LoginFormProps) => 
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         required
+        disabled={isLoading}
       />
-      <Button type="submit" className="w-full">
+      <Button type="submit" className="w-full" disabled={isLoading}>
         <LogIn className="w-4 h-4 mr-2" />
-        साइन इन
+        {isLoading ? 'लॉगिन हो रहा है...' : 'साइन इन'}
       </Button>
 
       <div className="mt-6 text-center space-y-2">
@@ -103,6 +112,7 @@ export const LoginForm = ({ onToggleForm, onShowResetForm }: LoginFormProps) => 
           onClick={onShowResetForm}
           className="text-sm text-blue-600 hover:underline block w-full"
           type="button"
+          disabled={isLoading}
         >
           पासवर्ड भूल गए?
         </button>
@@ -110,6 +120,7 @@ export const LoginForm = ({ onToggleForm, onShowResetForm }: LoginFormProps) => 
           onClick={onToggleForm}
           className="text-sm text-gray-600 hover:text-gray-900 transition-colors duration-200"
           type="button"
+          disabled={isLoading}
         >
           अकाउंट नहीं है? साइन अप करें
         </button>
