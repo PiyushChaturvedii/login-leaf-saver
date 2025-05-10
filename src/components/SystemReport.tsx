@@ -14,7 +14,7 @@ import { InvoiceManagement } from './admin/InvoiceManagement';
 interface User {
   email: string;
   name: string;
-  role: 'admin' | 'instructor' | 'student' | 'accounting';
+  role: 'admin' | 'instructor' | 'student' | 'accounting' | 'sales';
   password?: string;
   fees?: any;
 }
@@ -23,7 +23,7 @@ export const SystemReport = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [editingUser, setEditingUser] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
-  const [editRole, setEditRole] = useState<'admin' | 'instructor' | 'student' | 'accounting'>('student');
+  const [editRole, setEditRole] = useState<'admin' | 'instructor' | 'student' | 'accounting' | 'sales'>('student');
   const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
   const [currentUserRole, setCurrentUserRole] = useState<string | null>(null);
   
@@ -115,13 +115,14 @@ export const SystemReport = () => {
                     <div className="col-span-3">
                       <select 
                         value={editRole}
-                        onChange={(e) => setEditRole(e.target.value as 'admin' | 'instructor' | 'student' | 'accounting')}
+                        onChange={(e) => setEditRole(e.target.value as 'admin' | 'instructor' | 'student' | 'accounting' | 'sales')}
                         className="w-full p-2 border rounded"
                       >
                         <option value="admin">Admin</option>
                         <option value="instructor">Instructor</option>
                         <option value="student">Student</option>
                         <option value="accounting">Accounting</option>
+                        <option value="sales">Sales CRM</option>
                       </select>
                     </div>
                     <div className="col-span-2 flex justify-end space-x-1">

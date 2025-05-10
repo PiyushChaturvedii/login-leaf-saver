@@ -1,11 +1,11 @@
 
 import React from 'react';
-import { LogOut, BookOpen, Users, BarChart4, FileText, Calendar, GraduationCap, CheckSquare } from 'lucide-react';
+import { LogOut, BookOpen, Users, BarChart4, FileText, Calendar, GraduationCap, CheckSquare, Phone, UserPlus } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { LanguageToggle } from "@/components/ui/LanguageToggle";
 
 // Define the type for dashboard tabs
-type DashboardTab = 'projects' | 'profile' | 'attendance' | 'students' | 'fees' | 'users' | 'report';
+type DashboardTab = 'projects' | 'profile' | 'attendance' | 'students' | 'fees' | 'users' | 'report' | 'leads' | 'clients';
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -32,6 +32,7 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
   const isAdmin = userData.role === 'admin';
   const isInstructor = userData.role === 'instructor';
   const isStudent = userData.role === 'student';
+  const isSales = userData.role === 'sales';
   
   const handleTabClick = (tab: DashboardTab) => {
     setActiveTab(tab);
@@ -48,14 +49,16 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
           </div>
           
           <div className="space-y-2">
-            <Button 
-              variant={activeTab === 'projects' ? "default" : "ghost"} 
-              onClick={() => handleTabClick('projects')}
-              className="w-full justify-start"
-            >
-              <BookOpen className="w-4 h-4 mr-2" />
-              <span>Projects</span>
-            </Button>
+            {!isSales && (
+              <Button 
+                variant={activeTab === 'projects' ? "default" : "ghost"} 
+                onClick={() => handleTabClick('projects')}
+                className="w-full justify-start"
+              >
+                <BookOpen className="w-4 h-4 mr-2" />
+                <span>Projects</span>
+              </Button>
+            )}
             
             {isAdmin && (
               <>
@@ -124,6 +127,43 @@ export const MobileMenu: React.FC<MobileMenuProps> = ({
                 >
                   <CheckSquare className="w-4 h-4 mr-2" />
                   <span>Attendance</span>
+                </Button>
+              </>
+            )}
+            
+            {isSales && (
+              <>
+                <Button 
+                  variant={activeTab === 'leads' ? "default" : "ghost"}
+                  onClick={() => handleTabClick('leads')}
+                  className="w-full justify-start"
+                >
+                  <UserPlus className="w-4 h-4 mr-2" />
+                  <span>Leads</span>
+                </Button>
+                <Button 
+                  variant={activeTab === 'clients' ? "default" : "ghost"}
+                  onClick={() => handleTabClick('clients')}
+                  className="w-full justify-start"
+                >
+                  <Users className="w-4 h-4 mr-2" />
+                  <span>Clients</span>
+                </Button>
+                <Button 
+                  variant={activeTab === 'report' ? "default" : "ghost"}
+                  onClick={() => handleTabClick('report')}
+                  className="w-full justify-start"
+                >
+                  <BarChart4 className="w-4 h-4 mr-2" />
+                  <span>Reports</span>
+                </Button>
+                <Button 
+                  variant={activeTab === 'attendance' ? "default" : "ghost"}
+                  onClick={() => handleTabClick('attendance')}
+                  className="w-full justify-start"
+                >
+                  <Phone className="w-4 h-4 mr-2" />
+                  <span>Call Log</span>
                 </Button>
               </>
             )}

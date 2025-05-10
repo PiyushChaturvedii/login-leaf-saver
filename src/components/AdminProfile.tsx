@@ -16,7 +16,7 @@ import {
 interface UserData {
   email: string;
   name: string;
-  role: 'admin' | 'instructor' | 'student';
+  role: 'admin' | 'instructor' | 'student' | 'sales' | 'accounting';
   password: string;
   approved?: boolean;
   github?: string;
@@ -65,7 +65,7 @@ export const AdminProfile = () => {
     toast.success('User deleted successfully!');
   };
 
-  const handleRoleChange = (email: string, newRole: 'admin' | 'instructor' | 'student') => {
+  const handleRoleChange = (email: string, newRole: 'admin' | 'instructor' | 'student' | 'sales' | 'accounting') => {
     const updatedUsers = users.map(user =>
       user.email === email ? { ...user, role: newRole } : user
     );
@@ -94,7 +94,7 @@ export const AdminProfile = () => {
                     <p className="text-sm text-gray-600 mr-2">Role:</p>
                     <Select
                       defaultValue={user.role}
-                      onValueChange={(value: 'admin' | 'instructor' | 'student') => 
+                      onValueChange={(value: 'admin' | 'instructor' | 'student' | 'sales' | 'accounting') => 
                         handleRoleChange(user.email, value)
                       }
                     >
@@ -105,6 +105,8 @@ export const AdminProfile = () => {
                         <SelectItem value="admin">Admin</SelectItem>
                         <SelectItem value="instructor">Instructor</SelectItem>
                         <SelectItem value="student">Student</SelectItem>
+                        <SelectItem value="accounting">Accounting</SelectItem>
+                        <SelectItem value="sales">Sales CRM</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>

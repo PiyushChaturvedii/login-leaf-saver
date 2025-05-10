@@ -12,7 +12,7 @@ interface RegistrationFormProps {
 interface UserData {
   email: string;
   password: string;
-  role: 'admin' | 'instructor' | 'student';
+  role: 'admin' | 'instructor' | 'student' | 'sales' | 'accounting';
   name: string;
   approved?: boolean;
   github?: string;
@@ -31,7 +31,7 @@ export const RegistrationForm = ({ onToggleForm }: RegistrationFormProps) => {
   const [whatsapp, setWhatsapp] = useState('');
   const [college, setCollege] = useState('');
   const [course, setCourse] = useState('');
-  const [role, setRole] = useState<'admin' | 'instructor' | 'student'>('student');
+  const [role, setRole] = useState<'admin' | 'instructor' | 'student' | 'sales' | 'accounting'>('student');
 
   const handleRegistration = (e: React.FormEvent) => {
     e.preventDefault();
@@ -91,7 +91,7 @@ export const RegistrationForm = ({ onToggleForm }: RegistrationFormProps) => {
         required
       />
 
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         <Button
           type="button"
           variant={role === 'student' ? 'default' : 'outline'}
@@ -118,6 +118,15 @@ export const RegistrationForm = ({ onToggleForm }: RegistrationFormProps) => {
         >
           <UserCog className="w-4 h-4 mr-2" />
           एडमिन
+        </Button>
+        <Button
+          type="button"
+          variant={role === 'sales' ? 'default' : 'outline'}
+          className="flex-1"
+          onClick={() => setRole('sales')}
+        >
+          <UserCog className="w-4 h-4 mr-2" />
+          सेल्स
         </Button>
       </div>
 

@@ -13,6 +13,7 @@ import { SystemReport } from './components/SystemReport';
 import { ProjectManagement } from './components/ProjectManagement';
 import { Toaster } from "@/components/ui/sonner";
 import { Dashboard as DashboardComponent } from './components/Dashboard';
+import { SalesCRMDashboard } from './components/crm/SalesCRMDashboard';
 
 function App() {
   const [loggedInUser, setLoggedInUser] = useState(() => {
@@ -42,13 +43,34 @@ function App() {
         <div className="relative">
           <Toaster position="top-right" />
           <Routes>
-            <Route path="/" element={loggedInUser ? <Navigate to="/user-dashboard" /> : <Index />} />
+            <Route path="/" element={loggedInUser ? (
+              loggedInUser.role === 'sales' ? 
+                <Navigate to="/crm-dashboard" /> : 
+                <Navigate to="/user-dashboard" />
+            ) : <Index />} />
+            
             <Route path="/dashboard" element={loggedInUser ? <DashboardComponent onLogout={handleLogout} user={loggedInUser} /> : <Navigate to="/" />} />
             <Route path="/profile-setup" element={loggedInUser ? <ProfileSetup /> : <Navigate to="/" />} />
-            <Route path="/user-dashboard" element={loggedInUser ? <UserDashboard /> : <Navigate to="/" />} />
+            <Route path="/user-dashboard" element={
+              loggedInUser ? (
+                loggedInUser.role === 'sales' ? 
+                  <Navigate to="/crm-dashboard" /> : 
+                  <UserDashboard />
+              ) : <Navigate to="/" />
+            } />
+
+            {/* CRM Dashboard Route for Sales Role */}
+            <Route path="/crm-dashboard" element={
+              loggedInUser && loggedInUser.role === 'sales' ? (
+                <SalesCRMDashboard 
+                  user={loggedInUser} 
+                  onLogout={handleLogout} 
+                />
+              ) : <Navigate to="/" />
+            } />
 
             <Route path="/attendance" element={
-              loggedInUser ? (
+              loggedInUser && loggedInUser.role !== 'sales' ? (
                 <AttendanceSystem 
                   isInstructor={loggedInUser.role === "instructor" || loggedInUser.role === "admin"} 
                   userEmail={loggedInUser.email} 
@@ -57,7 +79,7 @@ function App() {
             } />
 
             <Route path="/course-materials" element={
-              loggedInUser ? (
+              loggedInUser && loggedInUser.role !== 'sales' ? (
                 <ProjectManagement 
                   userRole={loggedInUser.role === "accounting" ? "admin" : loggedInUser.role}
                   userEmail={loggedInUser.email}

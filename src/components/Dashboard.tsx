@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { LogOut, User, Users, Calendar, CreditCard, BookOpen } from 'lucide-react';
+import { LogOut, User, Users, Calendar, CreditCard, BookOpen, BarChart3 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { WelcomeMessage } from './WelcomeMessage';
@@ -19,6 +19,13 @@ export const Dashboard = ({ onLogout, user }: DashboardProps) => {
   const isAdmin = user.role === 'admin';
   const isInstructor = user.role === 'instructor';
   const isStudent = user.role === 'student';
+  const isSales = user.role === 'sales';
+
+  // For sales role, we will redirect to the CRM dashboard
+  if (isSales) {
+    window.location.href = '/crm-dashboard';
+    return null;
+  }
 
   return (
     <div className="container mx-auto p-4 max-w-6xl">
