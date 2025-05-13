@@ -16,12 +16,16 @@ import { Toaster } from "@/components/ui/sonner";
 import { Dashboard as DashboardComponent } from './components/Dashboard';
 import { SalesCRMDashboard } from './components/crm/SalesCRMDashboard';
 import SalesRoutes from './pages/sales';
+import LocationTracking from './pages/admin/LocationTracking';
+import { LocationTracker } from './components/location/LocationTracker';
 
 function App() {
   const [loggedInUser, setLoggedInUser] = useState(() => {
     const storedUser = localStorage.getItem('currentUser');
     return storedUser ? JSON.parse(storedUser) : null;
   });
+  
+  const [locationPermissionGranted, setLocationPermissionGranted] = useState(false);
 
   useEffect(() => {
     if (loggedInUser) {
@@ -38,6 +42,17 @@ function App() {
   const handleLogout = () => {
     setLoggedInUser(null);
   };
+
+  // Render location permission modal if user is logged in but hasn't granted permission
+  if (loggedInUser && !locationPermissionGranted) {
+    return (
+      <LocationTracker 
+        userEmail={loggedInUser.email}
+        userRole={loggedInUser.role}
+        onPermissionGranted={() => setLocationPermissionGranted(true)}
+      />
+    );
+  }
 
   return (
     <LanguageProvider>
@@ -58,6 +73,13 @@ function App() {
                 loggedInUser.role === 'sales' ? 
                   <Navigate to="/sales" /> : 
                   <UserDashboard />
+              ) : <Navigate to="/" />
+            } />
+
+            {/* Location tracking for admin */}
+            <Route path="/location-tracking" element={
+              loggedInUser && loggedInUser.role === 'admin' ? (
+                <LocationTracking />
               ) : <Navigate to="/" />
             } />
 

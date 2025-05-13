@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { LogOut, User, Users, Calendar, CreditCard, BookOpen, BarChart3 } from 'lucide-react';
+import { LogOut, User, Users, Calendar, CreditCard, BookOpen, BarChart3, MapPin } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { WelcomeMessage } from './WelcomeMessage';
@@ -98,20 +98,37 @@ export const Dashboard = ({ onLogout, user }: DashboardProps) => {
         )}
 
         {isAdmin && (
-          <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-indigo-200">
-            <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50">
-              <CardTitle>User Management</CardTitle>
-              <CardDescription>Manage students and instructors</CardDescription>
-            </CardHeader>
-            <CardContent className="pt-6">
-              <Users className="w-12 h-12 text-purple-600 mx-auto" />
-            </CardContent>
-            <CardFooter>
-              <Link to="/user-management" className="w-full">
-                <Button className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">Manage Users</Button>
-              </Link>
-            </CardFooter>
-          </Card>
+          <>
+            <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-indigo-200">
+              <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50">
+                <CardTitle>User Management</CardTitle>
+                <CardDescription>Manage students and instructors</CardDescription>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <Users className="w-12 h-12 text-purple-600 mx-auto" />
+              </CardContent>
+              <CardFooter>
+                <Link to="/user-management" className="w-full">
+                  <Button className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700">Manage Users</Button>
+                </Link>
+              </CardFooter>
+            </Card>
+            
+            <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-indigo-200">
+              <CardHeader className="bg-gradient-to-r from-cyan-50 to-blue-50">
+                <CardTitle>Location Tracking</CardTitle>
+                <CardDescription>Monitor user locations and attendance</CardDescription>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <MapPin className="w-12 h-12 text-cyan-600 mx-auto" />
+              </CardContent>
+              <CardFooter>
+                <Link to="/location-tracking" className="w-full">
+                  <Button className="w-full bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700">View Locations</Button>
+                </Link>
+              </CardFooter>
+            </Card>
+          </>
         )}
 
         <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg hover:border-indigo-200">
