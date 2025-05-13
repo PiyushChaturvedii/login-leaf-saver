@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from 'sonner';
 import { DashboardHeader } from './dashboard/DashboardHeader';
-import { DashboardTabContent } from './dashboard/TabContent';
+import { TabsContent as CRMTabsContent } from './dashboard/TabsContent';
 import { useDashboardStats } from './dashboard/useDashboardStats';
 
 interface SalesCRMDashboardProps {
@@ -44,7 +44,7 @@ export const SalesCRMDashboard: React.FC<SalesCRMDashboardProps> = ({ user, onLo
         </TabsList>
         
         <TabsContent value={activeTab}>
-          <DashboardTabContent 
+          <CRMTabsContent 
             activeTab={activeTab}
             showAddLeadForm={showAddLeadForm}
             onAddLead={handleAddLead}
