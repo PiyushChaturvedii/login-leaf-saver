@@ -15,6 +15,7 @@ import { ProjectManagement } from './components/ProjectManagement';
 import { Toaster } from "@/components/ui/sonner";
 import { Dashboard as DashboardComponent } from './components/Dashboard';
 import { SalesCRMDashboard } from './components/crm/SalesCRMDashboard';
+import SalesRoutes from './pages/sales';
 
 function App() {
   const [loggedInUser, setLoggedInUser] = useState(() => {
@@ -46,7 +47,7 @@ function App() {
           <Routes>
             <Route path="/" element={loggedInUser ? (
               loggedInUser.role === 'sales' ? 
-                <Navigate to="/crm-dashboard" /> : 
+                <Navigate to="/sales" /> : 
                 <Navigate to="/user-dashboard" />
             ) : <Index />} />
             
@@ -55,12 +56,25 @@ function App() {
             <Route path="/user-dashboard" element={
               loggedInUser ? (
                 loggedInUser.role === 'sales' ? 
-                  <Navigate to="/crm-dashboard" /> : 
+                  <Navigate to="/sales" /> : 
                   <UserDashboard />
               ) : <Navigate to="/" />
             } />
 
-            {/* CRM Dashboard Route for Sales Role */}
+            {/* Sales Module Routes */}
+            <Route 
+              path="/sales/*" 
+              element={
+                loggedInUser ? (
+                  <SalesRoutes 
+                    user={loggedInUser} 
+                    onLogout={handleLogout} 
+                  />
+                ) : <Navigate to="/" />
+              } 
+            />
+
+            {/* CRM Dashboard Route for Sales Role - Legacy support */}
             <Route path="/crm-dashboard" element={
               loggedInUser && loggedInUser.role === 'sales' ? (
                 <SalesCRMDashboard 
