@@ -23,8 +23,8 @@ const LocationTracking = () => {
   const [locationLogs, setLocationLogs] = useState<LocationData[]>([]);
   const [filteredLogs, setFilteredLogs] = useState<LocationData[]>([]);
   const [dateFilter, setDateFilter] = useState<string>('');
-  const [roleFilter, setRoleFilter] = useState<string>('');
-  const [userIdFilter, setUserIdFilter] = useState<string>('');
+  const [roleFilter, setRoleFilter] = useState<string>('all');
+  const [userIdFilter, setUserIdFilter] = useState<string>('all');
   const [users, setUsers] = useState<{id: string, name: string, role: string}[]>([]);
 
   useEffect(() => {
@@ -68,11 +68,11 @@ const LocationTracking = () => {
       filtered = filtered.filter(log => log.date === dateFilter);
     }
     
-    if (roleFilter) {
+    if (roleFilter && roleFilter !== 'all') {
       filtered = filtered.filter(log => log.role === roleFilter);
     }
     
-    if (userIdFilter) {
+    if (userIdFilter && userIdFilter !== 'all') {
       filtered = filtered.filter(log => log.userId === userIdFilter);
     }
     
@@ -116,7 +116,7 @@ const LocationTracking = () => {
                     <SelectValue placeholder="भूमिका द्वारा फ़िल्टर करें" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">सभी भूमिकाएँ</SelectItem>
+                    <SelectItem value="all">सभी भूमिकाएँ</SelectItem>
                     <SelectItem value="admin">एडमिन</SelectItem>
                     <SelectItem value="instructor">शिक्षक</SelectItem>
                     <SelectItem value="student">छात्र</SelectItem>
@@ -132,7 +132,7 @@ const LocationTracking = () => {
                     <SelectValue placeholder="उपयोगकर्ता द्वारा फ़िल्टर करें" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">सभी उपयोगकर्ता</SelectItem>
+                    <SelectItem value="all">सभी उपयोगकर्ता</SelectItem>
                     {users.map(user => (
                       <SelectItem key={user.id} value={user.id}>
                         {user.name} ({user.role})
