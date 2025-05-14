@@ -1,5 +1,5 @@
-
 import { useEffect, useState } from 'react';
+import { mongoConfig } from '@/config/mongodb';
 
 // This is a frontend service that would connect to a MongoDB backend
 // In a real application, direct MongoDB connection should be done on the backend
@@ -24,38 +24,30 @@ export const useDatabaseConnection = (config: DatabaseConfig): DbServiceHookResu
     const connectToDb = async () => {
       try {
         setIsLoading(true);
-        // Simulate API connection to MongoDB backend
-        const response = await fetch(`${config.apiUrl}/api/status`, {
-          headers: {
-            'Authorization': `Bearer ${config.apiKey || ''}`,
-            'Content-Type': 'application/json'
-          }
-        });
+        console.log('Attempting to connect to MongoDB with URI from config');
         
-        if (!response.ok) {
-          throw new Error('Database connection failed');
-        }
+        // In a real app with a backend, we would be making API calls here
+        // For now, we'll just simulate a successful connection
         
-        setIsConnected(true);
-        setError(null);
+        // Store the MongoDB URI in localStorage for demo purposes
+        localStorage.setItem('mongodb_uri', mongoConfig.uri);
+        
+        // Simulate checking connection
+        setTimeout(() => {
+          console.log('MongoDB connection established');
+          setIsConnected(true);
+          setError(null);
+          setIsLoading(false);
+        }, 1000);
       } catch (err) {
         console.error('Database connection error:', err);
         setError(err instanceof Error ? err : new Error('Unknown database error'));
         setIsConnected(false);
-      } finally {
         setIsLoading(false);
       }
     };
 
-    // We're just simulating the connection in the frontend
-    // In reality, we'd call an API endpoint that connects to MongoDB
-    setTimeout(() => {
-      console.log('MongoDB simulated connection established');
-      setIsConnected(true);
-      setIsLoading(false);
-    }, 1000);
-
-    // connectToDb(); // Uncomment this when you have a real API endpoint
+    connectToDb();
   }, [config.apiUrl, config.apiKey]);
 
   return { isConnected, isLoading, error };

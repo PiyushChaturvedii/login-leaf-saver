@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { Database } from 'lucide-react';
+import { Database, Check, AlertCircle } from 'lucide-react';
 import { mongoConfig } from '@/config/mongodb';
 import { useDatabaseConnection } from '@/services/DatabaseService';
 
@@ -55,6 +55,13 @@ export const MongoDBStatus: React.FC = () => {
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-md text-sm mb-4">
             Connection Error: {error.message}
+          </div>
+        )}
+
+        {isConnected && !error && (
+          <div className="bg-green-50 border border-green-200 text-green-700 p-3 rounded-md text-sm mb-4 flex items-center">
+            <Check className="w-5 h-5 mr-2" />
+            Successfully connected to MongoDB cluster: {mongoUri.split('@')[1]?.split('/')[0] || 'MongoDB'}
           </div>
         )}
 

@@ -7,8 +7,8 @@
  */
 
 export const mongoConfig = {
-  // MongoDB connection URI - can be customized by setting the REACT_APP_MONGODB_URI environment variable
-  uri: import.meta.env.VITE_MONGODB_URI || "mongodb+srv://your_mongodb_uri_here", 
+  // MongoDB connection URI - can be customized by setting the VITE_MONGODB_URI environment variable
+  uri: import.meta.env.VITE_MONGODB_URI || "mongodb+srv://piyush1chatur:FUIKmUSspZjT7iBW@cluster0.bmyydmt.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0", 
   
   // For frontend apps, we'd use an API endpoint instead of direct MongoDB connection
   apiUrl: import.meta.env.VITE_API_URL || "https://api.yourbackend.com",

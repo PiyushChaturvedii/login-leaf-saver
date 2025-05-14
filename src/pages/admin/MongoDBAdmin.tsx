@@ -24,11 +24,12 @@ const MongoDBAdmin: React.FC = () => {
         <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg text-sm text-blue-700">
           <h3 className="font-medium mb-2">Using MongoDB in this application</h3>
           <p className="mb-2">
-            This application uses a MongoDB-compatible interface with localStorage for demonstration purposes. 
-            In a production environment, you would connect to a real MongoDB database through a secure backend.
+            Your MongoDB connection string has been saved. In a production environment, you should secure this connection
+            through a backend server rather than exposing it in the frontend.
           </p>
           <p>
-            Set your MongoDB URI using the VITE_MONGODB_URI environment variable or update it in the configuration above.
+            The current implementation uses localStorage to simulate MongoDB operations for demonstration purposes.
+            In a real application, you would make API calls to a secure backend that connects to MongoDB.
           </p>
         </div>
       </div>
