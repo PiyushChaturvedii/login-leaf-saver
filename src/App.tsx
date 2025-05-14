@@ -43,22 +43,21 @@ function App() {
     setLoggedInUser(null);
   };
 
-  // Render location permission modal if user is logged in but hasn't granted permission
-  if (loggedInUser && !locationPermissionGranted) {
-    return (
-      <LocationTracker 
-        userEmail={loggedInUser.email}
-        userRole={loggedInUser.role}
-        onPermissionGranted={() => setLocationPermissionGranted(true)}
-      />
-    );
-  }
-
   return (
     <LanguageProvider>
       <Router>
         <div className="relative">
           <Toaster position="top-right" />
+          
+          {/* Move the LocationTracker inside the Router */}
+          {loggedInUser && !locationPermissionGranted && (
+            <LocationTracker 
+              userEmail={loggedInUser.email}
+              userRole={loggedInUser.role}
+              onPermissionGranted={() => setLocationPermissionGranted(true)}
+            />
+          )}
+          
           <Routes>
             <Route path="/" element={loggedInUser ? (
               loggedInUser.role === 'sales' ? 
