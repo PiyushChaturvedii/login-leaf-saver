@@ -1,201 +1,170 @@
 
 import { useState } from 'react';
-import { UserPlus, School, UserCog } from 'lucide-react';
-import { Button } from "@/components/ui/button";
+import { useNavigate } from 'react-router-dom';
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { toast } from "sonner";
+import { UserService } from "@/services/UserService";
 
 interface RegistrationFormProps {
   onToggleForm: () => void;
 }
 
-interface UserData {
-  email: string;
-  password: string;
-  role: 'admin' | 'instructor' | 'student' | 'sales' | 'accounting';
-  name: string;
-  approved?: boolean;
-  github?: string;
-  linkedin?: string;
-  whatsapp?: string;
-  college?: string;
-  course?: string;
-}
-
 export const RegistrationForm = ({ onToggleForm }: RegistrationFormProps) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
-  const [github, setGithub] = useState('');
-  const [linkedin, setLinkedin] = useState('');
-  const [whatsapp, setWhatsapp] = useState('');
-  const [college, setCollege] = useState('');
-  const [course, setCourse] = useState('');
-  const [role, setRole] = useState<'admin' | 'instructor' | 'student' | 'sales' | 'accounting'>('student');
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    role: 'student' as 'admin' | 'instructor' | 'student' | 'sales' | 'accounting',
+  });
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleRegistration = (e: React.FormEvent) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleRoleChange = (value: string) => {
+    setFormData(prev => ({ ...prev, role: value as 'admin' | 'instructor' | 'student' | 'sales' | 'accounting' }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    
+    if (formData.password !== formData.confirmPassword) {
+      toast.error("पासवर्ड मेल नहीं खाते");
+      return;
+    }
+    
+    setIsLoading(true);
+    
     try {
-      const existingData = JSON.parse(localStorage.getItem('users') || '[]');
+      // Create user using our MongoDB service
+      const newUser = await UserService.createUser({
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+        role: formData.role,
+        profileCompleted: false
+      });
       
-      if (existingData.some((user: UserData) => user.email === email)) {
-        toast.error("यूजर पहले से मौजूद है!");
-        return;
-      }
-
-      // Check if we're creating the first admin
-      const isFirstAdmin = role === 'admin' && !existingData.some((user: UserData) => user.role === 'admin');
-
-      const userData: UserData = {
-        email: isFirstAdmin ? 'admin@academy.com' : email,
-        password: isFirstAdmin ? 'admin123' : password,
-        role,
-        name,
-        approved: role === 'admin', // Admin users are auto-approved
-        ...(role === 'student' && {
-          github,
-          linkedin,
-          whatsapp,
-          college,
-          course,
-        }),
-      };
-
-      if (isFirstAdmin) {
-        toast.success("डिफ़ॉल्ट एडमिन क्रेडेंशियल्स सेट किए गए!");
-      }
-
-      existingData.push(userData);
-      localStorage.setItem('users', JSON.stringify(existingData));
-      
-      if (role !== 'admin') {
-        toast.success("पंजीकरण सफल! एडमिन अप्रूवल का इंतजार करें।");
+      if (newUser) {
+        // Store the user in localStorage
+        localStorage.setItem('currentUser', JSON.stringify(newUser));
+        
+        toast.success("पंजीकरण सफल!");
+        navigate('/profile-setup');
       } else {
-        toast.success("एडमिन पंजीकरण सफल! आप अब लॉगिन कर सकते हैं।");
+        toast.error("पंजीकरण विफल हो गया। कृपया पुन: प्रयास करें।");
       }
-      
-      onToggleForm();
     } catch (error) {
-      toast.error("एक त्रुटि हुई!");
+      console.error("Registration error:", error);
+      toast.error("पंजीकरण में त्रुटि हुई। कृपया पुन: प्रयास करें।");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleRegistration} className="space-y-4">
-      <Input
-        type="text"
-        placeholder="पूरा नाम"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        required
-      />
-
-      <div className="flex flex-wrap gap-2">
-        <Button
-          type="button"
-          variant={role === 'student' ? 'default' : 'outline'}
-          className="flex-1"
-          onClick={() => setRole('student')}
-        >
-          <School className="w-4 h-4 mr-2" />
-          छात्र
-        </Button>
-        <Button
-          type="button"
-          variant={role === 'instructor' ? 'default' : 'outline'}
-          className="flex-1"
-          onClick={() => setRole('instructor')}
-        >
-          <UserCog className="w-4 h-4 mr-2" />
-          शिक्षक
-        </Button>
-        <Button
-          type="button"
-          variant={role === 'admin' ? 'default' : 'outline'}
-          className="flex-1"
-          onClick={() => setRole('admin')}
-        >
-          <UserCog className="w-4 h-4 mr-2" />
-          एडमिन
-        </Button>
-        <Button
-          type="button"
-          variant={role === 'sales' ? 'default' : 'outline'}
-          className="flex-1"
-          onClick={() => setRole('sales')}
-        >
-          <UserCog className="w-4 h-4 mr-2" />
-          सेल्स
-        </Button>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="space-y-2">
+        <Label htmlFor="name">नाम</Label>
+        <Input 
+          id="name" 
+          name="name"
+          value={formData.name}
+          onChange={handleChange}
+          placeholder="अपना पूरा नाम दर्ज करें" 
+          required
+          disabled={isLoading}
+        />
       </div>
-
-      {role === 'student' && (
-        <>
-          <Input
-            type="text"
-            placeholder="GitHub प्रोफाइल URL"
-            value={github}
-            onChange={(e) => setGithub(e.target.value)}
-            required
-          />
-          <Input
-            type="text"
-            placeholder="LinkedIn प्रोफाइल URL"
-            value={linkedin}
-            onChange={(e) => setLinkedin(e.target.value)}
-            required
-          />
-          <Input
-            type="tel"
-            placeholder="WhatsApp नंबर"
-            value={whatsapp}
-            onChange={(e) => setWhatsapp(e.target.value)}
-            required
-          />
-          <Input
-            type="text"
-            placeholder="कॉलेज का नाम"
-            value={college}
-            onChange={(e) => setCollege(e.target.value)}
-            required
-          />
-          <Input
-            type="text"
-            placeholder="कोर्स/ब्रांच"
-            value={course}
-            onChange={(e) => setCourse(e.target.value)}
-            required
-          />
-        </>
-      )}
-
-      <Input
-        type="email"
-        placeholder="ईमेल"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        required
-      />
-      <Input
-        type="password"
-        placeholder="पासवर्ड"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        required
-      />
-      <Button type="submit" className="w-full">
-        <UserPlus className="w-4 h-4 mr-2" />
-        अकाउंट बनाएँ
-      </Button>
-
-      <button
-        onClick={onToggleForm}
-        className="text-sm text-gray-600 hover:text-gray-900 transition-colors duration-200 w-full text-center"
-        type="button"
+      
+      <div className="space-y-2">
+        <Label htmlFor="email">ईमेल</Label>
+        <Input 
+          id="email" 
+          name="email"
+          type="email" 
+          value={formData.email}
+          onChange={handleChange}
+          placeholder="अपना ईमेल पता दर्ज करें" 
+          required
+          disabled={isLoading}
+        />
+      </div>
+      
+      <div className="space-y-2">
+        <Label htmlFor="role">भूमिका</Label>
+        <Select 
+          value={formData.role} 
+          onValueChange={handleRoleChange}
+          disabled={isLoading}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="अपनी भूमिका चुनें" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="student">छात्र</SelectItem>
+            <SelectItem value="instructor">शिक्षक</SelectItem>
+            <SelectItem value="accounting">अकाउंटिंग</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+      
+      <div className="space-y-2">
+        <Label htmlFor="password">पासवर्ड</Label>
+        <Input 
+          id="password" 
+          name="password"
+          type="password" 
+          value={formData.password}
+          onChange={handleChange}
+          placeholder="एक मजबूत पासवर्ड बनाएं" 
+          required
+          disabled={isLoading}
+        />
+      </div>
+      
+      <div className="space-y-2">
+        <Label htmlFor="confirmPassword">पासवर्ड की पुष्टि करें</Label>
+        <Input 
+          id="confirmPassword" 
+          name="confirmPassword"
+          type="password" 
+          value={formData.confirmPassword}
+          onChange={handleChange}
+          placeholder="अपना पासवर्ड फिर से दर्ज करें" 
+          required
+          disabled={isLoading}
+        />
+      </div>
+      
+      <Button 
+        type="submit" 
+        className="w-full"
+        disabled={isLoading}
       >
-        पहले से अकाउंट है? साइन इन करें
-      </button>
+        {isLoading ? 'पंजीकरण हो रहा है...' : 'पंजीकरण करें'}
+      </Button>
+      
+      <div className="mt-4 text-center">
+        <p className="text-sm text-gray-600">
+          पहले से ही एक खाता है?{' '}
+          <Button 
+            variant="link" 
+            className="p-0 h-auto" 
+            type="button"
+            onClick={onToggleForm}
+          >
+            लॉग इन करें
+          </Button>
+        </p>
+      </div>
     </form>
   );
 };

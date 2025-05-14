@@ -1,10 +1,11 @@
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LogIn } from 'lucide-react';
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { UserService } from "@/services/UserService";
 
 interface LoginFormProps {
   onToggleForm: () => void;
@@ -13,118 +14,101 @@ interface LoginFormProps {
 
 export const LoginForm = ({ onToggleForm, onShowResetForm }: LoginFormProps) => {
   const navigate = useNavigate();
-  const [emailOrUsername, setEmailOrUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
     try {
-      console.log("Attempting login with:", emailOrUsername, password);
+      // Authenticate using our MongoDB service
+      const user = await UserService.authenticateUser(email, password);
       
-      // Check if this is the admin
-      if (emailOrUsername === 'admin@academy.com' && password === 'admin123') {
-        console.log("Admin login detected");
-        
-        // Set admin user details in localStorage
-        localStorage.setItem('currentUser', JSON.stringify({
-          email: 'admin@academy.com',
-          name: 'Admin',
-          role: 'admin',
-          profileCompleted: true
-        }));
-        
-        toast.success("एडमिन लॉगिन सफल!");
-        navigate('/user-dashboard');
-        return;
-      }
-      
-      // For non-admin users, check the stored users
-      const users = JSON.parse(localStorage.getItem('users') || '[]');
-      console.log("Retrieved users:", users);
-      
-      // Check if user exists by email OR username
-      const user = users.find((u: any) => 
-        (u.email === emailOrUsername || u.name === emailOrUsername) && u.password === password
-      );
-      
-      console.log("Found user:", user);
-
       if (user) {
-        // Admin users can bypass the approval check
-        if (!user.approved && user.role !== 'admin') {
-          toast.error("आपका अकाउंट एडमिन अप्रूवल के लिए पेंडिंग है!");
-          setIsLoading(false);
-          return;
+        // Store the user in localStorage
+        localStorage.setItem('currentUser', JSON.stringify(user));
+        
+        toast.success("सफलतापूर्वक लॉगिन किया गया!");
+        
+        // Redirect based on role and profile completion
+        if (!user.profileCompleted) {
+          navigate('/profile-setup');
+        } else if (user.role === 'sales') {
+          navigate('/sales');
+        } else {
+          navigate('/user-dashboard');
         }
-
-        localStorage.setItem('currentUser', JSON.stringify({
-          email: user.email,
-          name: user.name,
-          role: user.role,
-          github: user.github,
-          linkedin: user.linkedin,
-          whatsapp: user.whatsapp,
-          college: user.college,
-          course: user.course,
-          photo: user.photo,
-          profileCompleted: Boolean(user.github && user.linkedin && user.whatsapp && user.college && user.course)
-        }));
-        toast.success("लॉगिन सफल!");
-        navigate('/user-dashboard');
       } else {
-        toast.error("अमान्य क्रेडेंशियल्स!");
+        toast.error("अमान्य प्रमाण पत्र। कृपया पुन: प्रयास करें।");
       }
     } catch (error) {
       console.error("Login error:", error);
-      toast.error("एक त्रुटि हुई!");
+      toast.error("लॉगिन में त्रुटि हुई। कृपया पुन: प्रयास करें।");
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleLogin} className="space-y-4">
-      <Input
-        type="text"
-        placeholder="ईमेल या यूजरनेम"
-        value={emailOrUsername}
-        onChange={(e) => setEmailOrUsername(e.target.value)}
-        required
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="space-y-2">
+        <Label htmlFor="email">ईमेल</Label>
+        <Input 
+          id="email" 
+          type="email" 
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="आपका ईमेल पता दर्ज करें" 
+          required
+          disabled={isLoading}
+        />
+      </div>
+      
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <Label htmlFor="password">पासवर्ड</Label>
+          <Button 
+            variant="link" 
+            className="p-0 h-auto text-xs" 
+            type="button"
+            onClick={onShowResetForm}
+          >
+            पासवर्ड भूल गए?
+          </Button>
+        </div>
+        <Input 
+          id="password" 
+          type="password" 
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          placeholder="आपका पासवर्ड दर्ज करें" 
+          required
+          disabled={isLoading}
+        />
+      </div>
+      
+      <Button 
+        type="submit" 
+        className="w-full"
         disabled={isLoading}
-      />
-      <Input
-        type="password"
-        placeholder="पासवर्ड"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        required
-        disabled={isLoading}
-      />
-      <Button type="submit" className="w-full" disabled={isLoading}>
-        <LogIn className="w-4 h-4 mr-2" />
-        {isLoading ? 'लॉगिन हो रहा है...' : 'साइन इन'}
+      >
+        {isLoading ? 'लॉग इन कर रहा है...' : 'लॉग इन करें'}
       </Button>
-
-      <div className="mt-6 text-center space-y-2">
-        <button
-          onClick={onShowResetForm}
-          className="text-sm text-blue-600 hover:underline block w-full"
-          type="button"
-          disabled={isLoading}
-        >
-          पासवर्ड भूल गए?
-        </button>
-        <button
-          onClick={onToggleForm}
-          className="text-sm text-gray-600 hover:text-gray-900 transition-colors duration-200"
-          type="button"
-          disabled={isLoading}
-        >
-          अकाउंट नहीं है? साइन अप करें
-        </button>
+      
+      <div className="mt-4 text-center">
+        <p className="text-sm text-gray-600">
+          खाता नहीं है?{' '}
+          <Button 
+            variant="link" 
+            className="p-0 h-auto" 
+            type="button"
+            onClick={onToggleForm}
+          >
+            पंजीकरण करें
+          </Button>
+        </p>
       </div>
     </form>
   );

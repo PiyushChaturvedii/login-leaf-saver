@@ -17,7 +17,7 @@ import { Dashboard as DashboardComponent } from './components/Dashboard';
 import { SalesCRMDashboard } from './components/crm/SalesCRMDashboard';
 import SalesRoutes from './pages/sales';
 import LocationTracking from './pages/admin/LocationTracking';
-import { LocationTracker } from './components/location/LocationTracker';
+// import { LocationTracker } from './components/location/LocationTracker';
 
 function App() {
   const [loggedInUser, setLoggedInUser] = useState(() => {
@@ -49,7 +49,7 @@ function App() {
         <div className="relative">
           <Toaster position="top-right" />
           
-          {/* Move the LocationTracker inside the Router */}
+          {/* Commented out LocationTracker
           {loggedInUser && !locationPermissionGranted && (
             <LocationTracker 
               userEmail={loggedInUser.email}
@@ -57,6 +57,7 @@ function App() {
               onPermissionGranted={() => setLocationPermissionGranted(true)}
             />
           )}
+          */}
           
           <Routes>
             <Route path="/" element={loggedInUser ? (
@@ -75,12 +76,13 @@ function App() {
               ) : <Navigate to="/" />
             } />
 
-            {/* Location tracking for admin */}
+            {/* Location tracking for admin - commented out
             <Route path="/location-tracking" element={
               loggedInUser && loggedInUser.role === 'admin' ? (
                 <LocationTracking />
               ) : <Navigate to="/" />
             } />
+            */}
 
             {/* Sales Module Routes */}
             <Route 
