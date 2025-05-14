@@ -12,7 +12,7 @@ import { StudentProfile } from './components/StudentProfile';
 import { AdminFees } from './components/AdminFees';
 import { SystemReport } from './components/SystemReport';
 import { ProjectManagement } from './components/ProjectManagement';
-import { Toaster } from "@/components/ui/sonner";
+import { Toaster } from "sonner";
 import { Dashboard as DashboardComponent } from './components/Dashboard';
 import { SalesCRMDashboard } from './components/crm/SalesCRMDashboard';
 import SalesRoutes from './pages/sales';
@@ -46,6 +46,8 @@ function App() {
     setLoggedInUser(null);
   };
 
+  console.log("Current logged in user:", loggedInUser);
+
   return (
     <LanguageProvider>
       <Router>
@@ -65,25 +67,25 @@ function App() {
           <Routes>
             <Route path="/" element={loggedInUser ? (
               loggedInUser.role === 'sales' ? 
-                <Navigate to="/sales" /> : 
-                <Navigate to="/user-dashboard" />
+                <Navigate to="/sales" replace /> : 
+                <Navigate to="/user-dashboard" replace />
             ) : <Index />} />
             
-            <Route path="/dashboard" element={loggedInUser ? <DashboardComponent onLogout={handleLogout} user={loggedInUser} /> : <Navigate to="/" />} />
-            <Route path="/profile-setup" element={loggedInUser ? <ProfileSetup /> : <Navigate to="/" />} />
+            <Route path="/dashboard" element={loggedInUser ? <DashboardComponent onLogout={handleLogout} user={loggedInUser} /> : <Navigate to="/" replace />} />
+            <Route path="/profile-setup" element={loggedInUser ? <ProfileSetup /> : <Navigate to="/" replace />} />
             <Route path="/user-dashboard" element={
               loggedInUser ? (
                 loggedInUser.role === 'sales' ? 
-                  <Navigate to="/sales" /> : 
+                  <Navigate to="/sales" replace /> : 
                   <UserDashboard />
-              ) : <Navigate to="/" />
+              ) : <Navigate to="/" replace />
             } />
 
             {/* MongoDB Admin Route */}
             <Route path="/mongodb-admin" element={
               loggedInUser && loggedInUser.role === 'admin' ? (
                 <MongoDBAdmin />
-              ) : <Navigate to="/" />
+              ) : <Navigate to="/" replace />
             } />
 
             {/* Sales Module Routes */}
@@ -95,7 +97,7 @@ function App() {
                     user={loggedInUser} 
                     onLogout={handleLogout} 
                   />
-                ) : <Navigate to="/" />
+                ) : <Navigate to="/" replace />
               } 
             />
 
@@ -106,7 +108,7 @@ function App() {
                   user={loggedInUser} 
                   onLogout={handleLogout} 
                 />
-              ) : <Navigate to="/" />
+              ) : <Navigate to="/" replace />
             } />
 
             <Route path="/attendance" element={
@@ -115,7 +117,7 @@ function App() {
                   isInstructor={loggedInUser.role === "instructor" || loggedInUser.role === "admin"} 
                   userEmail={loggedInUser.email} 
                 />
-              ) : <Navigate to="/" />
+              ) : <Navigate to="/" replace />
             } />
 
             <Route path="/course-materials" element={
@@ -124,7 +126,7 @@ function App() {
                   userRole={loggedInUser.role === "accounting" ? "admin" : loggedInUser.role}
                   userEmail={loggedInUser.email}
                 />
-              ) : <Navigate to="/" />
+              ) : <Navigate to="/" replace />
             } />
 
             {loggedInUser && loggedInUser.role === "student" && (

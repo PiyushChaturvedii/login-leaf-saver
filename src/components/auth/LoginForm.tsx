@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/use-toast";
 import { UserService } from "@/services/UserService";
 
 interface LoginFormProps {
@@ -32,14 +32,19 @@ export const LoginForm = ({ onToggleForm, onShowResetForm }: LoginFormProps) => 
         
         toast.success("सफलतापूर्वक लॉगिन किया गया!");
         
+        console.log("User authenticated successfully:", user);
+        console.log("Redirecting based on role:", user.role);
+        
         // Redirect based on role and profile completion
-        if (!user.profileCompleted) {
-          navigate('/profile-setup');
-        } else if (user.role === 'sales') {
-          navigate('/sales');
-        } else {
-          navigate('/user-dashboard');
-        }
+        setTimeout(() => {
+          if (!user.profileCompleted) {
+            navigate('/profile-setup');
+          } else if (user.role === 'sales') {
+            navigate('/sales');
+          } else {
+            navigate('/user-dashboard');
+          }
+        }, 100);
       } else {
         toast.error("अमान्य प्रमाण पत्र। कृपया पुन: प्रयास करें।");
       }

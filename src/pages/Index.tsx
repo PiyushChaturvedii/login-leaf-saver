@@ -1,5 +1,6 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { School, UserCog } from 'lucide-react';
 import { Card } from "@/components/ui/card";
 import { LoginForm } from '@/components/auth/LoginForm';
@@ -9,6 +10,24 @@ import { PasswordResetForm } from '@/components/auth/PasswordResetForm';
 const Index = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [showResetForm, setShowResetForm] = useState(false);
+  const navigate = useNavigate();
+
+  // Check if user is already logged in on component mount
+  useEffect(() => {
+    const currentUser = localStorage.getItem('currentUser');
+    if (currentUser) {
+      const user = JSON.parse(currentUser);
+      
+      // Redirect based on role and profile completion
+      if (!user.profileCompleted) {
+        navigate('/profile-setup');
+      } else if (user.role === 'sales') {
+        navigate('/sales');
+      } else {
+        navigate('/user-dashboard');
+      }
+    }
+  }, [navigate]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 p-4">
