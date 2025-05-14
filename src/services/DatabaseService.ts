@@ -50,6 +50,7 @@ export const useDatabaseConnection = (config: DatabaseConfig): DbServiceHookResu
     // We're just simulating the connection in the frontend
     // In reality, we'd call an API endpoint that connects to MongoDB
     setTimeout(() => {
+      console.log('MongoDB simulated connection established');
       setIsConnected(true);
       setIsLoading(false);
     }, 1000);
@@ -60,10 +61,13 @@ export const useDatabaseConnection = (config: DatabaseConfig): DbServiceHookResu
   return { isConnected, isLoading, error };
 };
 
-// Mock service for demonstration purposes
-// In a real app, these operations would be handled by API calls to a backend
+// Enhanced DbService with MongoDB-like operations
 export const DbService = {
+  /**
+   * Create a document in a collection
+   */
   create: async (collection: string, data: any): Promise<any> => {
+    console.log(`Creating document in ${collection}`, data);
     // Store in localStorage for demonstration purposes
     const existingData = localStorage.getItem(collection) || '[]';
     const parsedData = JSON.parse(existingData);
@@ -73,14 +77,32 @@ export const DbService = {
     return newItem;
   },
   
+  /**
+   * Find documents in a collection with query
+   */
   find: async (collection: string, query: Record<string, any> = {}): Promise<any[]> => {
+    console.log(`Finding documents in ${collection} with query`, query);
     const existingData = localStorage.getItem(collection) || '[]';
     const parsedData = JSON.parse(existingData);
     
-    // Simple filtering
+    // Simple filtering - MongoDB-like query
     return parsedData.filter((item: any) => {
       for (const key in query) {
-        if (item[key] !== query[key]) {
+        // Handle special operators like $eq, $gt, $lt, etc.
+        if (typeof query[key] === 'object' && query[key] !== null) {
+          // Handle $eq operator
+          if (query[key].$eq !== undefined && item[key] !== query[key].$eq) {
+            return false;
+          }
+          // Handle $ne operator
+          if (query[key].$ne !== undefined && item[key] === query[key].$ne) {
+            return false;
+          }
+          // Handle $in operator
+          if (query[key].$in !== undefined && !query[key].$in.includes(item[key])) {
+            return false;
+          }
+        } else if (item[key] !== query[key]) {
           return false;
         }
       }
@@ -88,13 +110,21 @@ export const DbService = {
     });
   },
   
+  /**
+   * Find a document by its ID
+   */
   findById: async (collection: string, id: string): Promise<any> => {
+    console.log(`Finding document in ${collection} with id ${id}`);
     const existingData = localStorage.getItem(collection) || '[]';
     const parsedData = JSON.parse(existingData);
     return parsedData.find((item: any) => item._id === id);
   },
   
+  /**
+   * Update a document by ID
+   */
   update: async (collection: string, id: string, data: any): Promise<any> => {
+    console.log(`Updating document in ${collection} with id ${id}`, data);
     const existingData = localStorage.getItem(collection) || '[]';
     const parsedData = JSON.parse(existingData);
     const index = parsedData.findIndex((item: any) => item._id === id);
@@ -108,7 +138,11 @@ export const DbService = {
     throw new Error('Document not found');
   },
   
+  /**
+   * Delete a document by ID
+   */
   delete: async (collection: string, id: string): Promise<boolean> => {
+    console.log(`Deleting document in ${collection} with id ${id}`);
     const existingData = localStorage.getItem(collection) || '[]';
     const parsedData = JSON.parse(existingData);
     const filteredData = parsedData.filter((item: any) => item._id !== id);

@@ -2,18 +2,16 @@
 /**
  * MongoDB Configuration
  * 
- * Note: In a real application, these values should be loaded from environment variables
- * and the actual MongoDB connection should be established on the backend server.
- * 
- * This is just a placeholder for demonstration purposes.
+ * This configuration file sets up the MongoDB connection settings.
+ * The MongoDB URI can be provided as an environment variable or can be set directly here.
  */
 
 export const mongoConfig = {
-  // In a real application with a backend server, the URI would be used server-side
-  uri: "mongodb+srv://your_mongodb_uri_here", 
+  // MongoDB connection URI - can be customized by setting the REACT_APP_MONGODB_URI environment variable
+  uri: import.meta.env.VITE_MONGODB_URI || "mongodb+srv://your_mongodb_uri_here", 
   
   // For frontend apps, we'd use an API endpoint instead of direct MongoDB connection
-  apiUrl: "https://api.yourbackend.com",
+  apiUrl: import.meta.env.VITE_API_URL || "https://api.yourbackend.com",
   
   options: {
     useNewUrlParser: true,

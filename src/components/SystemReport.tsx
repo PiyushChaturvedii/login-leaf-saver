@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Edit, Trash, Users } from "lucide-react";
+import { ArrowLeft, Edit, Trash, Users, Database } from "lucide-react";
 import { Link } from 'react-router-dom';
 import { toast } from "sonner";
 import { Input } from './ui/input';
@@ -75,14 +75,25 @@ export const SystemReport = () => {
   
   return (
     <div className="space-y-6">
-      <div className="flex items-center mb-4">
-        <Link to="/dashboard">
-          <Button variant="ghost" size="icon" className="mr-2 rounded-full">
-            <ArrowLeft className="w-5 h-5" />
-            <span className="sr-only">Back to Dashboard</span>
-          </Button>
-        </Link>
-        <h1 className="text-2xl font-bold">User Management</h1>
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center">
+          <Link to="/dashboard">
+            <Button variant="ghost" size="icon" className="mr-2 rounded-full">
+              <ArrowLeft className="w-5 h-5" />
+              <span className="sr-only">Back to Dashboard</span>
+            </Button>
+          </Link>
+          <h1 className="text-2xl font-bold">User Management</h1>
+        </div>
+        
+        {currentUserRole === 'admin' && (
+          <Link to="/mongodb-admin">
+            <Button variant="outline" className="flex items-center">
+              <Database className="mr-2 h-4 w-4" />
+              MongoDB Admin
+            </Button>
+          </Link>
+        )}
       </div>
       
       <Card className="bg-white shadow-md">

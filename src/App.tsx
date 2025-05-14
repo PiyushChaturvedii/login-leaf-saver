@@ -16,7 +16,9 @@ import { Toaster } from "@/components/ui/sonner";
 import { Dashboard as DashboardComponent } from './components/Dashboard';
 import { SalesCRMDashboard } from './components/crm/SalesCRMDashboard';
 import SalesRoutes from './pages/sales';
-import LocationTracking from './pages/admin/LocationTracking';
+import MongoDBAdmin from './pages/admin/MongoDBAdmin';
+// Location tracking imports are commented out
+// import LocationTracking from './pages/admin/LocationTracking';
 // import { LocationTracker } from './components/location/LocationTracker';
 
 function App() {
@@ -25,7 +27,8 @@ function App() {
     return storedUser ? JSON.parse(storedUser) : null;
   });
   
-  const [locationPermissionGranted, setLocationPermissionGranted] = useState(false);
+  // Commented out location tracking state
+  // const [locationPermissionGranted, setLocationPermissionGranted] = useState(false);
 
   useEffect(() => {
     if (loggedInUser) {
@@ -49,7 +52,7 @@ function App() {
         <div className="relative">
           <Toaster position="top-right" />
           
-          {/* Commented out LocationTracker
+          {/* Location Tracker commented out
           {loggedInUser && !locationPermissionGranted && (
             <LocationTracker 
               userEmail={loggedInUser.email}
@@ -76,13 +79,12 @@ function App() {
               ) : <Navigate to="/" />
             } />
 
-            {/* Location tracking for admin - commented out
-            <Route path="/location-tracking" element={
+            {/* MongoDB Admin Route */}
+            <Route path="/mongodb-admin" element={
               loggedInUser && loggedInUser.role === 'admin' ? (
-                <LocationTracking />
+                <MongoDBAdmin />
               ) : <Navigate to="/" />
             } />
-            */}
 
             {/* Sales Module Routes */}
             <Route 
