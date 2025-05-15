@@ -43,10 +43,37 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
 }) => {
   const [attendanceCode, setAttendanceCode] = useState<AttendanceCode | null>(null);
   const [submittedCode, setSubmittedCode] = useState('');
-  const [attendances, setAttendances] = useState<Attendance[]>(loadAttendances());
+  const [attendances, setAttendances] = useState<Attendance[]>([]);
   const [sessionDate, setSessionDate] = useState<Date | undefined>(new Date());
   const [sessionName, setSessionName] = useState('');
   const [timeLeft, setTimeLeft] = useState<{minutes: number, seconds: number} | null>(null);
+  const [studentEmails, setStudentEmails] = useState<string[]>([]);
+
+  // Load attendances and student emails
+  useEffect(() => {
+    const fetchAttendances = async () => {
+      try {
+        const loadedAttendances = await loadAttendances();
+        setAttendances(loadedAttendances);
+      } catch (error) {
+        console.error("Error loading attendances:", error);
+        setAttendances([]);
+      }
+    };
+
+    const fetchStudentEmails = async () => {
+      try {
+        const emails = await getAllStudentEmails();
+        setStudentEmails(emails);
+      } catch (error) {
+        console.error("Error loading student emails:", error);
+        setStudentEmails([]);
+      }
+    };
+
+    fetchAttendances();
+    fetchStudentEmails();
+  }, []);
 
   useEffect(() => {
     loadAndValidateAttendanceCode(setAttendanceCode);
@@ -140,7 +167,11 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
   };
 
   const getOverallStatsData = () => {
-    return getOverallStats(getAllStudentEmails(), attendances);
+    return getOverallStats(studentEmails, attendances);
+  };
+
+  const getAllStudentEmailsSync = () => {
+    return studentEmails;
   };
 
   const value: AttendanceContextType = {
@@ -160,7 +191,7 @@ export const AttendanceProvider: React.FC<AttendanceProviderProps> = ({
     handleDeleteAttendance,
     getStudentStats,
     getAttendanceId: getAttendanceIdHelper,
-    getAllStudentEmails,
+    getAllStudentEmails: getAllStudentEmailsSync,
     getDaysWithSessionsData,
     getSessionsForDateData,
     isDateInMonthCheck,

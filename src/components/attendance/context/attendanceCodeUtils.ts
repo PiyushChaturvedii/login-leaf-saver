@@ -34,14 +34,20 @@ export const setupCodeTimer = (
 /**
  * Loads and validates the attendance code from localStorage
  */
-export const loadAndValidateAttendanceCode = (
+export const loadAndValidateAttendanceCode = async (
   setAttendanceCode: React.Dispatch<React.SetStateAction<AttendanceCode | null>>
 ) => {
-  // Load attendance code from localStorage
-  const parsedCode = loadAttendanceCode();
-  if (parsedCode && Date.now() < parsedCode.expiresAt) {
-    setAttendanceCode(parsedCode);
-  } else if (parsedCode) {
+  try {
+    // Load attendance code from localStorage
+    const parsedCode = await loadAttendanceCode();
+    if (parsedCode && Date.now() < parsedCode.expiresAt) {
+      setAttendanceCode(parsedCode);
+    } else if (parsedCode) {
+      removeAttendanceCode();
+    }
+  } catch (error) {
+    console.error("Error loading attendance code:", error);
+    // In case of error, ensure we don't have invalid data
     removeAttendanceCode();
   }
 };

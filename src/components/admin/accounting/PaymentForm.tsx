@@ -16,19 +16,29 @@ export const PaymentForm = ({ students, onPaymentRecorded, onCancel }: PaymentFo
   const [selectedStudent, setSelectedStudent] = useState<string>('');
   const [amount, setAmount] = useState<number>(0);
   const [receiptNumber, setReceiptNumber] = useState<string>('');
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
 
-  const handleAddPayment = () => {
-    const updatedUsers = recordPayment(selectedStudent, amount, receiptNumber);
-    if (updatedUsers) {
-      const filteredStudents = updatedUsers.filter(
-        (u: UserData) => u.role === 'student' && u.fees?.amount
-      );
-      onPaymentRecorded(filteredStudents);
-      
-      // Reset form
-      setSelectedStudent('');
-      setAmount(0);
-      setReceiptNumber('');
+  const handleAddPayment = async () => {
+    setIsProcessing(true);
+    
+    try {
+      const updatedUsers = await recordPayment(selectedStudent, amount, receiptNumber);
+      if (updatedUsers) {
+        // Filter students from updated users
+        const filteredStudents = updatedUsers.filter(
+          (u: UserData) => u.role === 'student' && u.fees?.amount
+        );
+        onPaymentRecorded(filteredStudents);
+        
+        // Reset form
+        setSelectedStudent('');
+        setAmount(0);
+        setReceiptNumber('');
+      }
+    } catch (error) {
+      console.error("Error processing payment:", error);
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -70,9 +80,9 @@ export const PaymentForm = ({ students, onPaymentRecorded, onCancel }: PaymentFo
           <Button 
             className="w-full"
             onClick={handleAddPayment}
-            disabled={!selectedStudent || amount <= 0 || !receiptNumber}
+            disabled={isProcessing || !selectedStudent || amount <= 0 || !receiptNumber}
           >
-            Record Payment
+            {isProcessing ? "Processing..." : "Record Payment"}
           </Button>
         </div>
       </div>

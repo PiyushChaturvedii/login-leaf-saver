@@ -11,10 +11,23 @@ import { loadStudentsWithFees, generateCSVExport } from './accounting/Accounting
 export const AccountingRole = () => {
   const [students, setStudents] = useState<UserData[]>([]);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // Load users from localStorage
-    setStudents(loadStudentsWithFees());
+    const loadStudents = async () => {
+      try {
+        setIsLoading(true);
+        const loadedStudents = await loadStudentsWithFees();
+        setStudents(loadedStudents);
+      } catch (error) {
+        console.error("Error loading students with fees:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    loadStudents();
   }, []);
 
   const handlePaymentRecorded = (updatedStudents: UserData[]) => {
