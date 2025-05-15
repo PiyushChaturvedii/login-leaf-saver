@@ -13,14 +13,16 @@ export const mongoConfig = {
   // For frontend apps, we'd use an API endpoint instead of direct MongoDB connection
   apiUrl: import.meta.env.VITE_API_URL || "https://api.yourbackend.com",
   
+  // API Key for authentication with the backend (if needed)
+  apiKey: import.meta.env.VITE_API_KEY,
+  
   options: {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   }
 };
 
-// Sample schema definitions that would be used on a backend server
-// These are just for reference and don't actually connect to MongoDB in the frontend
+// Schema definitions that match the MongoDB collections
 export const schemaDefinitions = {
   user: {
     name: { type: String, required: true },
@@ -53,5 +55,16 @@ export const schemaDefinitions = {
     assignedTo: { type: String },
     dueDate: { type: Date },
     status: { type: String, enum: ['not_started', 'in_progress', 'completed', 'delayed'] },
+  },
+  
+  crm_lead: {
+    name: { type: String, required: true },
+    email: { type: String, required: true },
+    phone: { type: String, required: true },
+    course: { type: String, required: true },
+    source: { type: String },
+    status: { type: String, enum: ['new', 'follow-up', 'converted', 'closed'], default: 'new' },
+    notes: { type: String },
+    createdAt: { type: Date, default: Date.now },
   }
 };

@@ -2,31 +2,31 @@
 import { UserData } from '../../fees/FeesTypes';
 import { format } from 'date-fns';
 import { toast } from "sonner";
+import { DbService } from '@/services/DatabaseService';
 
 /**
  * Record a new payment for a student
  */
-export const recordPayment = (
+export const recordPayment = async (
   selectedStudent: string,
   amount: number,
   receiptNumber: string
-): UserData[] | null => {
+): Promise<UserData[] | null> => {
   if (!selectedStudent || amount <= 0 || !receiptNumber) {
     toast.error("Please fill all fields correctly!");
     return null;
   }
 
   try {
-    // Get all users
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    const userIndex = users.findIndex((u: UserData) => u.email === selectedStudent);
-
-    if (userIndex === -1) {
+    // Get the student from MongoDB
+    const users = await DbService.find('users', { email: selectedStudent });
+    
+    if (users.length === 0) {
       toast.error("Student not found!");
       return null;
     }
 
-    const user = users[userIndex];
+    const user = users[0];
     
     if (!user.fees) {
       toast.error("Student has no fee record!");
@@ -45,7 +45,7 @@ export const recordPayment = (
     const newPaid = (user.fees.paid || 0) + amount;
     const newPaidEmis = Math.floor(newPaid / user.fees.emiPlan.emiAmount);
 
-    users[userIndex] = {
+    const updatedUser = {
       ...user,
       fees: {
         ...user.fees,
@@ -59,11 +59,11 @@ export const recordPayment = (
       }
     };
 
-    // Save updated users to localStorage
-    localStorage.setItem('users', JSON.stringify(users));
+    // Save updated user to MongoDB
+    await DbService.update('users', user._id, updatedUser);
     
     toast.success("Payment recorded successfully!");
-    return users;
+    return await DbService.find('users');
   } catch (error) {
     console.error("Payment recording error:", error);
     toast.error("Failed to record payment!");
@@ -74,11 +74,15 @@ export const recordPayment = (
 /**
  * Generate CSV data for exporting
  */
-export const generateCSVExport = (students: UserData[]) => {
+export const generateCSVExport = async (students: UserData[]) => {
+  // Get all students with fees from MongoDB
+  const users = await DbService.find('users', { role: 'student' });
+  const studentsWithFees = users.filter((s: UserData) => s.fees?.amount);
+  
   // Prepare CSV data
   let csvContent = "Student Email,Name,Total Fees,Paid Amount,Remaining,Last Payment Date,Receipt Numbers\n";
   
-  students.forEach(student => {
+  studentsWithFees.forEach(student => {
     if (student.fees) {
       const receipts = student.fees.payments?.map(p => p.receipt).join("; ") || "";
       const lastPaid = student.fees.lastPaid ? format(new Date(student.fees.lastPaid), 'yyyy-MM-dd') : "N/A";
@@ -101,9 +105,9 @@ export const generateCSVExport = (students: UserData[]) => {
 };
 
 /**
- * Load student data with fees from localStorage
+ * Load student data with fees from MongoDB
  */
-export const loadStudentsWithFees = (): UserData[] => {
-  const users = JSON.parse(localStorage.getItem('users') || '[]');
-  return users.filter((u: UserData) => u.role === 'student' && u.fees?.amount);
+export const loadStudentsWithFees = async (): Promise<UserData[]> => {
+  const users = await DbService.find('users', { role: 'student' });
+  return users.filter((u: UserData) => u.fees?.amount);
 };

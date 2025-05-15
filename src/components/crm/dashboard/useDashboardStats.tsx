@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from 'react';
+import { DbService } from '@/services/DatabaseService';
 
 interface DashboardStats {
   totalLeads: number;
@@ -16,9 +17,9 @@ export const useDashboardStats = () => {
     pending: 0
   });
 
-  const loadStats = () => {
-    // Load leads from localStorage
-    const leads = JSON.parse(localStorage.getItem('crm_leads') || '[]');
+  const loadStats = async () => {
+    // Load leads from MongoDB
+    const leads = await DbService.find('crm_leads');
     
     // Calculate dashboard stats
     const totalLeads = leads.length;
