@@ -7,11 +7,14 @@ import { LoginForm } from '@/components/auth/LoginForm';
 import { RegistrationForm } from '@/components/auth/RegistrationForm';
 import { PasswordResetForm } from '@/components/auth/PasswordResetForm';
 import { LanguageToggle } from '@/components/ui/LanguageToggle';
+import { useLanguage } from '@/context/LanguageContext';
+import { t } from '@/lib/translations';
 
 const Index = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [showResetForm, setShowResetForm] = useState(false);
   const navigate = useNavigate();
+  const { language } = useLanguage();
 
   // Check if user is already logged in on component mount
   useEffect(() => {
@@ -47,7 +50,10 @@ const Index = () => {
             )}
           </div>
           <h1 className="text-2xl font-semibold text-gray-800 mb-2">
-            {showResetForm ? 'पासवर्ड रीसेट' : (isLogin ? 'अकादमी लॉगिन' : 'पंजीकरण')}
+            {showResetForm 
+              ? t('passwordReset', language) 
+              : (isLogin ? t('academyLogin', language) : t('registration', language))
+            }
           </h1>
         </div>
 

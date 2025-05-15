@@ -5,12 +5,15 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { UserService } from "@/services/UserService";
+import { useLanguage } from '@/context/LanguageContext';
+import { t } from '@/lib/translations';
 
 interface PasswordResetProps {
   onBack: () => void;
 }
 
 export const PasswordResetForm = ({ onBack }: PasswordResetProps) => {
+  const { language } = useLanguage();
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -26,14 +29,14 @@ export const PasswordResetForm = ({ onBack }: PasswordResetProps) => {
       if (user) {
         // In a real application, you would send a reset email here
         // For now, we'll just simulate success
-        toast.success("पासवर्ड रीसेट निर्देश आपके ईमेल पर भेजे गए हैं");
+        toast.success(t('resetSuccess', language));
         setIsSubmitted(true);
       } else {
-        toast.error("उस ईमेल से कोई खाता नहीं मिला");
+        toast.error(t('noAccountFound', language));
       }
     } catch (error) {
       console.error("Password reset error:", error);
-      toast.error("पासवर्ड रीसेट में त्रुटि हुई। कृपया पुन: प्रयास करें।");
+      toast.error(t('resetError', language));
     } finally {
       setIsLoading(false);
     }
@@ -48,14 +51,15 @@ export const PasswordResetForm = ({ onBack }: PasswordResetProps) => {
           </svg>
         </div>
         
-        <h3 className="text-lg font-medium">पासवर्ड रीसेट भेजा गया</h3>
+        <h3 className="text-lg font-medium">{t('passwordResetSent', language)}</h3>
         <p className="text-sm text-gray-600">
-          हमने {email} पर पासवर्ड रीसेट निर्देश भेज दिए हैं।
-          कृपया अपना इनबॉक्स देखें और निर्देशों का पालन करें।
+          {t('checkInbox', language)} {email}.
+          <br />
+          {t('followInstructions', language)}
         </p>
         
         <Button onClick={onBack} className="mt-4 w-full">
-          लॉगिन पर वापस जाएं
+          {t('backToLogin', language)}
         </Button>
       </div>
     );
@@ -64,20 +68,20 @@ export const PasswordResetForm = ({ onBack }: PasswordResetProps) => {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="reset-email">ईमेल पता</Label>
+        <Label htmlFor="reset-email">{t('emailAddress', language)}</Label>
         <Input
           id="reset-email"
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="अपना पंजीकृत ईमेल पता दर्ज करें"
+          placeholder={t('enterRegisteredEmail', language)}
           required
           disabled={isLoading}
         />
       </div>
       
       <p className="text-sm text-gray-600">
-        हम आपको एक पासवर्ड रीसेट लिंक भेजेंगे जिसे आप अपने खाते तक पुन: पहुंच प्राप्त करने के लिए उपयोग कर सकते हैं।
+        {t('resetInstructions', language)}
       </p>
       
       <div className="flex gap-2">
@@ -88,7 +92,7 @@ export const PasswordResetForm = ({ onBack }: PasswordResetProps) => {
           className="flex-1"
           disabled={isLoading}
         >
-          वापस जाएं
+          {t('back', language)}
         </Button>
         
         <Button
@@ -96,7 +100,7 @@ export const PasswordResetForm = ({ onBack }: PasswordResetProps) => {
           className="flex-1"
           disabled={isLoading}
         >
-          {isLoading ? 'भेज रहा है...' : 'रीसेट भेजें'}
+          {isLoading ? t('sending', language) : t('sendReset', language)}
         </Button>
       </div>
     </form>

@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { toast } from "@/components/ui/use-toast";
 import { UserService } from "@/services/UserService";
+import { useLanguage } from '@/context/LanguageContext';
+import { t } from '@/lib/translations';
 
 interface LoginFormProps {
   onToggleForm: () => void;
@@ -14,6 +16,7 @@ interface LoginFormProps {
 
 export const LoginForm = ({ onToggleForm, onShowResetForm }: LoginFormProps) => {
   const navigate = useNavigate();
+  const { language } = useLanguage();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -30,7 +33,7 @@ export const LoginForm = ({ onToggleForm, onShowResetForm }: LoginFormProps) => 
         // Store the user in localStorage
         localStorage.setItem('currentUser', JSON.stringify(user));
         
-        toast.success("सफलतापूर्वक लॉगिन किया गया!");
+        toast.success(t('loginSuccess', language));
         
         console.log("User authenticated successfully:", user);
         console.log("Redirecting based on role:", user.role);
@@ -46,11 +49,11 @@ export const LoginForm = ({ onToggleForm, onShowResetForm }: LoginFormProps) => 
           }
         }, 100);
       } else {
-        toast.error("अमान्य प्रमाण पत्र। कृपया पुन: प्रयास करें।");
+        toast.error(t('invalidCredentials', language));
       }
     } catch (error) {
       console.error("Login error:", error);
-      toast.error("लॉगिन में त्रुटि हुई। कृपया पुन: प्रयास करें।");
+      toast.error(t('loginError', language));
     } finally {
       setIsLoading(false);
     }
@@ -59,13 +62,13 @@ export const LoginForm = ({ onToggleForm, onShowResetForm }: LoginFormProps) => 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="email">ईमेल</Label>
+        <Label htmlFor="email">{t('email', language)}</Label>
         <Input 
           id="email" 
           type="email" 
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="आपका ईमेल पता दर्ज करें" 
+          placeholder={t('enterYourEmail', language)} 
           required
           disabled={isLoading}
         />
@@ -73,14 +76,14 @@ export const LoginForm = ({ onToggleForm, onShowResetForm }: LoginFormProps) => 
       
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <Label htmlFor="password">पासवर्ड</Label>
+          <Label htmlFor="password">{t('password', language)}</Label>
           <Button 
             variant="link" 
             className="p-0 h-auto text-xs" 
             type="button"
             onClick={onShowResetForm}
           >
-            पासवर्ड भूल गए?
+            {t('forgotPassword', language)}
           </Button>
         </div>
         <Input 
@@ -88,7 +91,7 @@ export const LoginForm = ({ onToggleForm, onShowResetForm }: LoginFormProps) => 
           type="password" 
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          placeholder="आपका पासवर्ड दर्ज करें" 
+          placeholder={t('enterYourPassword', language)} 
           required
           disabled={isLoading}
         />
@@ -99,19 +102,19 @@ export const LoginForm = ({ onToggleForm, onShowResetForm }: LoginFormProps) => 
         className="w-full"
         disabled={isLoading}
       >
-        {isLoading ? 'लॉग इन कर रहा है...' : 'लॉग इन करें'}
+        {isLoading ? t('loggingIn', language) : t('login', language)}
       </Button>
       
       <div className="mt-4 text-center">
         <p className="text-sm text-gray-600">
-          खाता नहीं है?{' '}
+          {t('dontHaveAccount', language)}{' '}
           <Button 
             variant="link" 
             className="p-0 h-auto" 
             type="button"
             onClick={onToggleForm}
           >
-            पंजीकरण करें
+            {t('register', language)}
           </Button>
         </p>
       </div>

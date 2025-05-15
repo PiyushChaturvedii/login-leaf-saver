@@ -7,6 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { toast } from "sonner";
 import { UserService } from "@/services/UserService";
+import { useLanguage } from '@/context/LanguageContext';
+import { t } from '@/lib/translations';
 
 interface RegistrationFormProps {
   onToggleForm: () => void;
@@ -14,6 +16,7 @@ interface RegistrationFormProps {
 
 export const RegistrationForm = ({ onToggleForm }: RegistrationFormProps) => {
   const navigate = useNavigate();
+  const { language } = useLanguage();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -36,7 +39,7 @@ export const RegistrationForm = ({ onToggleForm }: RegistrationFormProps) => {
     e.preventDefault();
     
     if (formData.password !== formData.confirmPassword) {
-      toast.error("पासवर्ड मेल नहीं खाते");
+      toast.error(t('passwordsDontMatch', language));
       return;
     }
     
@@ -56,14 +59,14 @@ export const RegistrationForm = ({ onToggleForm }: RegistrationFormProps) => {
         // Store the user in localStorage
         localStorage.setItem('currentUser', JSON.stringify(newUser));
         
-        toast.success("पंजीकरण सफल!");
+        toast.success(t('registrationSuccess', language));
         navigate('/profile-setup');
       } else {
-        toast.error("पंजीकरण विफल हो गया। कृपया पुन: प्रयास करें।");
+        toast.error(t('registrationFailed', language));
       }
     } catch (error) {
       console.error("Registration error:", error);
-      toast.error("पंजीकरण में त्रुटि हुई। कृपया पुन: प्रयास करें।");
+      toast.error(t('registrationError', language));
     } finally {
       setIsLoading(false);
     }
@@ -72,73 +75,73 @@ export const RegistrationForm = ({ onToggleForm }: RegistrationFormProps) => {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="name">नाम</Label>
+        <Label htmlFor="name">{t('name', language)}</Label>
         <Input 
           id="name" 
           name="name"
           value={formData.name}
           onChange={handleChange}
-          placeholder="अपना पूरा नाम दर्ज करें" 
+          placeholder={t('enterYourFullName', language)} 
           required
           disabled={isLoading}
         />
       </div>
       
       <div className="space-y-2">
-        <Label htmlFor="email">ईमेल</Label>
+        <Label htmlFor="email">{t('email', language)}</Label>
         <Input 
           id="email" 
           name="email"
           type="email" 
           value={formData.email}
           onChange={handleChange}
-          placeholder="अपना ईमेल पता दर्ज करें" 
+          placeholder={t('enterYourEmail', language)} 
           required
           disabled={isLoading}
         />
       </div>
       
       <div className="space-y-2">
-        <Label htmlFor="role">भूमिका</Label>
+        <Label htmlFor="role">{t('role', language)}</Label>
         <Select 
           value={formData.role} 
           onValueChange={handleRoleChange}
           disabled={isLoading}
         >
           <SelectTrigger>
-            <SelectValue placeholder="अपनी भूमिका चुनें" />
+            <SelectValue placeholder={t('chooseYourRole', language)} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="student">छात्र</SelectItem>
-            <SelectItem value="instructor">शिक्षक</SelectItem>
-            <SelectItem value="accounting">अकाउंटिंग</SelectItem>
+            <SelectItem value="student">{t('student', language)}</SelectItem>
+            <SelectItem value="instructor">{t('instructor', language)}</SelectItem>
+            <SelectItem value="accounting">{t('accounting', language)}</SelectItem>
           </SelectContent>
         </Select>
       </div>
       
       <div className="space-y-2">
-        <Label htmlFor="password">पासवर्ड</Label>
+        <Label htmlFor="password">{t('password', language)}</Label>
         <Input 
           id="password" 
           name="password"
           type="password" 
           value={formData.password}
           onChange={handleChange}
-          placeholder="एक मजबूत पासवर्ड बनाएं" 
+          placeholder={t('createStrongPassword', language)} 
           required
           disabled={isLoading}
         />
       </div>
       
       <div className="space-y-2">
-        <Label htmlFor="confirmPassword">पासवर्ड की पुष्टि करें</Label>
+        <Label htmlFor="confirmPassword">{t('confirmPassword', language)}</Label>
         <Input 
           id="confirmPassword" 
           name="confirmPassword"
           type="password" 
           value={formData.confirmPassword}
           onChange={handleChange}
-          placeholder="अपना पासवर्ड फिर से दर्ज करें" 
+          placeholder={t('reenterPassword', language)} 
           required
           disabled={isLoading}
         />
@@ -149,19 +152,19 @@ export const RegistrationForm = ({ onToggleForm }: RegistrationFormProps) => {
         className="w-full"
         disabled={isLoading}
       >
-        {isLoading ? 'पंजीकरण हो रहा है...' : 'पंजीकरण करें'}
+        {isLoading ? t('registering', language) : t('register', language)}
       </Button>
       
       <div className="mt-4 text-center">
         <p className="text-sm text-gray-600">
-          पहले से ही एक खाता है?{' '}
+          {t('alreadyHaveAccount', language)}{' '}
           <Button 
             variant="link" 
             className="p-0 h-auto" 
             type="button"
             onClick={onToggleForm}
           >
-            लॉग इन करें
+            {t('login', language)}
           </Button>
         </p>
       </div>

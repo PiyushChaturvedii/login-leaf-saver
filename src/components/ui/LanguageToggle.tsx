@@ -16,11 +16,10 @@ export const LanguageToggle = () => {
             variant="ghost" 
             size="icon" 
             onClick={toggleLanguage}
-            className="hover:bg-soft-purple rounded-full"
+            className="hover:bg-soft-purple rounded-full flex items-center gap-2"
           >
-            <Languages 
-              className={`w-5 h-5 ${language === 'hi' ? 'text-secondary-purple' : 'text-primary-purple'}`} 
-            />
+            <Languages className={`w-5 h-5 ${language === 'hi' ? 'text-secondary-purple' : 'text-primary-purple'}`} />
+            <span className="text-xs font-medium">{language === 'hi' ? 'हि' : 'EN'}</span>
           </Button>
         </TooltipTrigger>
         <TooltipContent>
