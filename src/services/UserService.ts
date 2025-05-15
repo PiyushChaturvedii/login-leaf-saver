@@ -1,5 +1,5 @@
 
-import { DbService } from './DatabaseService';
+import { DbService } from './database';
 
 export interface User {
   _id?: string;
