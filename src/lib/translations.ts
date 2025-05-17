@@ -242,5 +242,5 @@ export const t = (key: keyof typeof translations, language: 'en' | 'hi'): string
   
   // Fallback to the key itself if translation is missing
   console.warn(`Translation missing for key: ${key}`);
-  return key;
+  return String(key);  // Convert to string explicitly to fix the type error
 };
