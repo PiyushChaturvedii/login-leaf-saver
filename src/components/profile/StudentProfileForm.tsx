@@ -10,6 +10,9 @@ import { NameSection } from './form-sections/NameSection';
 import { GuardianSection } from './form-sections/GuardianSection';
 import { CourseSection } from './form-sections/CourseSection';
 import { FeeSection } from './form-sections/FeeSection';
+import { StudentIdSection } from './form-sections/StudentIdSection';
+import { DateOfBirthSection } from './form-sections/DateOfBirthSection';
+import { GenderSection } from './form-sections/GenderSection';
 
 interface StudentProfileFormProps {
   initialData?: Partial<StudentFormData>;
@@ -43,10 +46,31 @@ export const StudentProfileForm = ({ initialData = {}, onSubmit }: StudentProfil
       <CardContent className="pt-6">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-4">
+            <StudentIdSection 
+              studentId={formData.studentId}
+              error={errors.studentId}
+              onChange={handleChange}
+              language={language}
+            />
+            
             <NameSection 
               name={formData.name}
               error={errors.name}
               onChange={handleChange}
+              language={language}
+            />
+            
+            <DateOfBirthSection 
+              dateOfBirth={formData.dateOfBirth}
+              error={errors.dateOfBirth}
+              onChange={handleChange}
+              language={language}
+            />
+            
+            <GenderSection 
+              gender={formData.gender}
+              error={errors.gender}
+              onValueChange={(value) => handleSelectChange('gender', value)}
               language={language}
             />
             
