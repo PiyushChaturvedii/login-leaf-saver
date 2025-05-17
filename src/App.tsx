@@ -66,9 +66,11 @@ function App() {
           
           <Routes>
             <Route path="/" element={loggedInUser ? (
-              loggedInUser.role === 'sales' ? 
-                <Navigate to="/sales" replace /> : 
-                <Navigate to="/user-dashboard" replace />
+              !loggedInUser.profileCompleted ? 
+                <Navigate to="/profile-setup" replace /> :
+                loggedInUser.role === 'sales' ? 
+                  <Navigate to="/sales" replace /> : 
+                  <Navigate to="/user-dashboard" replace />
             ) : <Index />} />
             
             <Route path="/dashboard" element={loggedInUser ? <DashboardComponent onLogout={handleLogout} user={loggedInUser} /> : <Navigate to="/" replace />} />

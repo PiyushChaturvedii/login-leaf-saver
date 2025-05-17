@@ -21,13 +21,17 @@ const Index = () => {
     const currentUser = localStorage.getItem('currentUser');
     if (currentUser) {
       const user = JSON.parse(currentUser);
+      console.log("Index page - User found in localStorage:", user);
       
       // Redirect based on role and profile completion
       if (!user.profileCompleted) {
+        console.log("User profile not completed, redirecting to profile setup");
         navigate('/profile-setup');
       } else if (user.role === 'sales') {
+        console.log("Sales user, redirecting to sales dashboard");
         navigate('/sales');
       } else {
+        console.log("Regular user, redirecting to user dashboard");
         navigate('/user-dashboard');
       }
     }

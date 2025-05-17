@@ -37,17 +37,17 @@ export const LoginForm = ({ onToggleForm, onShowResetForm }: LoginFormProps) => 
         
         console.log("User authenticated successfully:", user);
         console.log("Redirecting based on role:", user.role);
+        console.log("Profile completed status:", user.profileCompleted);
         
         // Redirect based on role and profile completion
-        setTimeout(() => {
-          if (!user.profileCompleted) {
-            navigate('/profile-setup');
-          } else if (user.role === 'sales') {
-            navigate('/sales');
-          } else {
-            navigate('/user-dashboard');
-          }
-        }, 100);
+        if (!user.profileCompleted) {
+          console.log("Redirecting to profile setup");
+          navigate('/profile-setup');
+        } else if (user.role === 'sales') {
+          navigate('/sales');
+        } else {
+          navigate('/user-dashboard');
+        }
       } else {
         toast.error(t('invalidCredentials', language));
       }

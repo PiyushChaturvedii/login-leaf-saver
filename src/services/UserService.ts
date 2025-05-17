@@ -160,7 +160,7 @@ export const UserService = {
       email: 'student@example.com',
       password: 'password123',
       role: 'student',
-      profileCompleted: true
+      profileCompleted: false
     });
     
     await DbService.create('users', {
@@ -177,6 +177,15 @@ export const UserService = {
       password: 'password123',
       role: 'accounting',
       profileCompleted: true
+    });
+
+    // Add the specific student user we saw in logs for testing
+    await DbService.create('users', {
+      name: 'ram',
+      email: 'student@aeeron.in',
+      password: '12345',
+      role: 'student',
+      profileCompleted: false
     });
   }
 })();

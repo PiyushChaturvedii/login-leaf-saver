@@ -31,6 +31,7 @@ const ProfileSetup = () => {
     }
     
     const parsedUser = JSON.parse(currentUser);
+    console.log("Profile Setup - User data:", parsedUser);
     setUserData(parsedUser);
     setIsLoading(false);
   }, [navigate]);
@@ -39,6 +40,8 @@ const ProfileSetup = () => {
     if (!userData) return;
     
     try {
+      console.log("Submitting profile data:", formData);
+      
       // Update in-memory state
       const updatedUser = {
         ...userData,
@@ -46,10 +49,12 @@ const ProfileSetup = () => {
         profileCompleted: true
       };
       
+      console.log("Updated user:", updatedUser);
+      
       // Update localStorage for current user
       localStorage.setItem('currentUser', JSON.stringify(updatedUser));
       
-      // Also update in the users array
+      // Also update in the users array if using localStorage users array
       const users = JSON.parse(localStorage.getItem('users') || '[]');
       const updatedUsers = users.map((user: any) => {
         if (user.email === userData.email) {
@@ -65,7 +70,13 @@ const ProfileSetup = () => {
       localStorage.setItem('users', JSON.stringify(updatedUsers));
       
       toast.success(t('profileUpdated', language));
-      navigate('/dashboard');
+      
+      // Redirect to appropriate dashboard based on role
+      if (updatedUser.role === 'sales') {
+        navigate('/sales');
+      } else {
+        navigate('/user-dashboard');
+      }
     } catch (error) {
       console.error("Profile update error:", error);
       toast.error("Profile update error");
